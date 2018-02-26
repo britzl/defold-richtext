@@ -1,12 +1,9 @@
 local richtext = require "richtext.richtext"
 
-local TEXT = "Lorem <color=0,0.5,0,1>ipsum</color> dolor <color=red>sit</color> <color=#ff00ffff>amet</color>, <size=1.75><font=Nanum>consectetur</font></size> adipiscing elit. <b>Nunc</b> tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>. Nullam ornare accumsan rhoncus. Nunc placerat nibh a purus auctor, id scelerisque massa rutrum. Phasellus dui nulla, finibus eu neque sit amet, interdum suscipit mauris. Phasellus mattis sem sed leo pretium, eu eleifend quam bibendum."
---local TEXT = "Lorem <color=0,1,0,1>ipsum</color=0,1,0,1> dolor <color=red>sit</color=red> amet, <size=2><font=alagard>consectetur</font=alagard></size=2> adipiscing elit."
---local TEXT = "Lorem <color=0,1,0,1>ipsum</color=0,1,0,1> dolor <color=red>sit</color=red> amet, <size=2><font=alagard>consectetur</font=alagard></size> adipiscing elit. Nunc tincidunt mattis libero non viverra. Nullam ornare accumsan rhoncus. Nunc placerat nibh a purus auctor, id scelerisque massa rutrum. Phasellus dui nulla, finibus eu neque sit amet, interdum suscipit mauris. Phasellus mattis sem sed leo pretium, eu eleifend quam bibendum."
+local TEXT = "Lorem <color=0,0.5,0,1>ipsum </color>dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.75><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>. Nullam ornare accumsan rhoncus. Nunc placerat nibh a purus auctor, id scelerisque massa rutrum. Phasellus dui nulla, finibus eu neque sit amet, interdum suscipit mauris. Phasellus mattis sem sed leo pretium, eu eleifend quam bibendum."
 
 function init(self)
 	local settings = {
-		font = "Roboto",
 		fonts = {
 			Roboto = {
 				regular = hash("Roboto-Regular"),
@@ -20,7 +17,12 @@ function init(self)
 			Nanum = {
 				regular = hash("Nanum-Regular"),
 			},
-		}
+		},
+		width = 400,
+		position = vmath.vector3(0, 0, 0),
+		parent = gui.get_node("parent"),
 	}
-	self.paragraphs = richtext.create(TEXT, gui.get_node("parent"), 400, settings)
+
+	print(TEXT)
+	self.nodes = richtext.create(TEXT, "Roboto", settings)
 end

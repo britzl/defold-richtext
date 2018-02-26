@@ -26,58 +26,76 @@ local function get_font(word, settings)
 		end
 	end
 	if not font then
-		font = font_name
+		font = settings.font
 	end
-	return hash(font)
+	return font
 end
 
-function M.create(text, parent, width, settings)
+function M.create(text, font, settings)
 	assert(text)
-	assert(parent)
-	assert(width)
-	assert(settings)
-	assert(settings.font)
+	assert(font)
+	settings = settings or {}
+	settings.font = font
+	settings.fonts = settings.fonts or {}
+	if not settings.fonts[font] then
+		settings.fonts[font] = {
+			regular = hash(font)
+		}
+	end
 	settings.color = settings.color or vmath.vector4(1)
+	settings.position = settings.position or vmath.vector3()
 
-	
+	-- cache length of a single space, per font
+	local space_widths = {}
 
-	local initial_position = vmath.vector3()
-	local position = vmath.vector3()
+	local position = vmath.vector3(settings.position)
 	
 	local words = parser.parse(text)
 	local highest_word = 0
+	local nodes = {}
 	for _,word in pairs(words) do
+		-- assign defaults if needed
 		word.color = word.color or settings.color
 		word.font = word.font or settings.font
 		word.size = word.size or 1
 
-
-		
-		local node = gui.new_text_node(vmath.vector3(0), word.text)
+		-- get font to use based on word tags
 		local font = get_font(word, settings)
-		gui.set_parent(node, parent)
+
+		-- create and configure text node
+		local node = gui.new_text_node(vmath.vector3(0), word.text)
+		nodes[#nodes + 1] = node
+		if settings.parent then
+			gui.set_parent(node, settings.parent)
+		end
 		gui.set_font(node, font)
 		gui.set_pivot(node, gui.PIVOT_NW)
 		gui.set_color(node, word.color)
 		gui.set_scale(node, vmath.vector3(1) * (word.size or 1))
 
-		local space_width = gui.get_text_metrics(font, "_").width
+		-- measure width of a single space for current font
+		if not space_widths[font] then
+			space_widths[font] = gui.get_text_metrics(font, "_").width
+		end
 
+		-- get metrics of node
 		word.metrics = gui.get_text_metrics_from_node(node)
-		word.metrics.total_width = (word.metrics.width + #get_trailing_whitespace(word.text) * space_width) * word.size
+		word.metrics.total_width = (word.metrics.width + #get_trailing_whitespace(word.text) * space_widths[font]) * word.size
 		word.metrics.width = word.metrics.width * word.size
 		word.metrics.height = word.metrics.height * word.size
-		word.node = node
-
 		highest_word = math.max(highest_word, word.metrics.height)
 
-		if position.x + word.metrics.width > width then
+		-- adjust position and position node
+		if settings.width and position.x + word.metrics.width > settings.width then
 			position.y = position.y - highest_word
-			position.x = initial_position.x
+			position.x = settings.position.x
+			highest_word = 0
 		end
 		gui.set_position(node, position)
 		position.x = position.x + word.metrics.total_width
 	end
+
+	return nodes
 end
 
 

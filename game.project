@@ -1,5 +1,6 @@
 [project]
 title = RichText
+version = 1.0.0
 
 [bootstrap]
 main_collection = /example/example.collectionc
