@@ -86,7 +86,8 @@ function M.create(text, font, settings)
 		highest_word = math.max(highest_word, word.metrics.height)
 
 		-- adjust position and position node
-		if settings.width and position.x + word.metrics.width > settings.width then
+		local width = position.x + word.metrics.width - settings.position.x
+		if settings.width and width > settings.width then
 			position.y = position.y - highest_word
 			position.x = settings.position.x
 			highest_word = 0
