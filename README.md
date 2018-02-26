@@ -74,9 +74,6 @@ The RichText library will create gui text nodes representing the markup in the t
 				bold = hash("Roboto-Bold"),
 				bold_italic = hash("Roboto-BoldItalic"),
 			},
-			VeraMo = {
-				regular = hash("VeraMo"),
-			},
 			Nanum = {
 				regular = hash("Nanum-Regular"),
 			},
@@ -85,8 +82,16 @@ The RichText library will create gui text nodes representing the markup in the t
 		position = vmath.vector3(0, 0, 0),
 		parent = gui.get_node("parent"),
 	}
-	self.nodes = richtext.create("Lorem <b>ipsum</b> dolor <color=red>sit</color> amet.", "Roboto", settings)
 
+	local text = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color>dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>. Nullam ornare accumsan rhoncus. Nunc placerat nibh a purus auctor, id scelerisque massa rutrum."
+
+	self.nodes = richtext.create(text, "Roboto", settings)
+
+This would result in the following output:
+
+![](docs/example.png)
+
+## API
 ### richtext.create(text, settings)
 Creates rich text gui nodes from a text containing markup.
 
