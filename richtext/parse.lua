@@ -59,7 +59,7 @@ local function parse_tag(tag, params)
 	return settings
 end
 
-
+-- add a single word to the list of words
 local function add_word(text, settings, words)
 	local data = { text = text }
 	for k,v in pairs(settings) do
@@ -68,21 +68,41 @@ local function add_word(text, settings, words)
 	words[#words + 1] = data
 end
 
-local function split_and_add(text, settings, words)
-	local ws_start, trimmed_text, ws_end = text:match("^(%s*)(.-)(%s*)$")
+-- split a line into words
+local function split_line(line, settings, words)
+	local ws_start, trimmed_text, ws_end = line:match("^(%s*)(.-)(%s*)$")
 	if trimmed_text == "" then
 		add_word(ws_start .. ws_end, settings, words)
 	else
 		local wi = #words
-		for word in text:gmatch("%S+") do
+		for word in trimmed_text:gmatch("%S+") do
 			add_word(word .. " ", settings, words)
 		end
-		if #words > wi then
-			local first = words[wi + 1]
-			first.text = ws_start .. first.text
-			local last = words[#words]
-			last.text = last.text:sub(1,#last.text - 1) .. ws_end
-		end
+		local first = words[wi + 1]
+		first.text = ws_start .. first.text
+		local last = words[#words]
+		last.text = last.text:sub(1,#last.text - 1) .. ws_end
+	end
+end
+
+-- split text
+-- split by lines first
+local function split_text(text, settings, words)
+	local added_linebreak = false
+	if text:sub(-1)~="\n" then
+		added_linebreak = true
+		text = text .. "\n"
+	end
+
+	for line in text:gmatch("(.-)\n") do
+		split_line(line, settings, words)
+		local last = words[#words]
+		last.linebreak = true
+	end
+
+	if added_linebreak then
+		local last = words[#words]
+		last.linebreak = false
 	end
 end
 
@@ -114,13 +134,13 @@ function M.parse(s, parent_settings)
 		local before, tag, params, text, after = find_tag(s)
 		-- no more tags? Split and add the entire string
 		if not tag then
-			split_and_add(s, parent_settings, all_words)
+			split_text(s, parent_settings, all_words)
 			break
 		end
 
 		-- split and add text before the encountered tag
 		if before ~= "" then
-			split_and_add(before, parent_settings, all_words)
+			split_text(before, parent_settings, all_words)
 		end
 
 		-- parse the tag and merge it with settings for the parent tag

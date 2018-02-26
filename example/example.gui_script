@@ -1,6 +1,6 @@
 local richtext = require "richtext.richtext"
 
-local TEXT = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color>dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>. Nullam ornare accumsan rhoncus. Nunc placerat nibh a purus auctor, id scelerisque massa rutrum."
+local TEXT = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color>dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa rutrum."
 
 function init(self)
 	local settings = {

@@ -46,7 +46,7 @@ function M.create(text, font, settings)
 	settings.position = settings.position or vmath.vector3()
 
 	-- cache length of a single space, per font
-	local space_widths = {}
+	local font_sizes = {}
 
 	local position = vmath.vector3(settings.position)
 	
@@ -74,26 +74,39 @@ function M.create(text, font, settings)
 		gui.set_scale(node, vmath.vector3(1) * (word.size or 1))
 
 		-- measure width of a single space for current font
-		if not space_widths[font] then
-			space_widths[font] = gui.get_text_metrics(font, " _").width - gui.get_text_metrics(font, "_").width
+		if not font_sizes[font] then
+			font_sizes[font] = {
+				space = gui.get_text_metrics(font, " _").width - gui.get_text_metrics(font, "_").width,
+				height = gui.get_text_metrics(font, "Ij").height,
+			}
 		end
 
 		-- get metrics of node
 		word.metrics = gui.get_text_metrics_from_node(node)
-		word.metrics.total_width = (word.metrics.width + #get_trailing_whitespace(word.text) * space_widths[font]) * word.size
+		word.metrics.total_width = (word.metrics.width + #get_trailing_whitespace(word.text) * font_sizes[font].space) * word.size
 		word.metrics.width = word.metrics.width * word.size
 		word.metrics.height = word.metrics.height * word.size
 		highest_word = math.max(highest_word, word.metrics.height)
 
-		-- adjust position and position node
+		-- move word to next row if it overflows the width
 		local width = position.x + word.metrics.width - settings.position.x
 		if settings.width and width > settings.width then
 			position.y = position.y - highest_word
 			position.x = settings.position.x
-			highest_word = 0
+			highest_word = font_sizes[font].height
 		end
+
+		-- position word
 		gui.set_position(node, position)
-		position.x = position.x + word.metrics.total_width
+
+		-- handle linebreak or advance on same line
+		if word.linebreak then
+			position.y = position.y - highest_word
+			position.x = settings.position.x
+			highest_word = font_sizes[font].height
+		else
+			position.x = position.x + word.metrics.total_width
+		end
 	end
 
 	return nodes
