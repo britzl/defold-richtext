@@ -75,7 +75,7 @@ function M.create(text, font, settings)
 
 		-- measure width of a single space for current font
 		if not space_widths[font] then
-			space_widths[font] = gui.get_text_metrics(font, "_").width
+			space_widths[font] = gui.get_text_metrics(font, " _").width - gui.get_text_metrics(font, "_").width
 		end
 
 		-- get metrics of node
