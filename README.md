@@ -1,1 +1,2 @@
-# defold-richtext
+# defold-empty
+Empty Defold project

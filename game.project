@@ -1,0 +1,16 @@
+[project]
+title = RichText
+
+[bootstrap]
+main_collection = /example/example.collectionc
+
+[input]
+game_binding = /input/game.input_bindingc
+
+[display]
+width = 640
+height = 1136
+
+[script]
+shared_state = 1
+
