@@ -39,29 +39,29 @@ The following tags are supported:
 The following named colors are supported:
 
 | Name      | Hex value   | Swatch                            |
-|-----------|-------------|-----------------------------------|
-| aqua      | `#00ffffff` | [<font color="#00ffff">■■■■■■</font>] |
-| black     | `#000000ff` | [<font color="#000000">■■■■■■</font>] |
-| blue      | `#0000ffff` | [<font color="#0000ff">■■■■■■</font>] |
-| brown     | `#a52a2aff` | [<font color="#a52a2a">■■■■■■</font>] |
-| cyan      | `#00ffffff` | [<font color="#00ffff">■■■■■■</font>] |
-| darkblue  | `#0000a0ff` | [<font color="#0000a0">■■■■■■</font>] |
-| fuchsia   | `#ff00ffff` | [<font color="#ff00ff">■■■■■■</font>] |
-| green     | `#008000ff` | [<font color="#008000">■■■■■■</font>] |
-| grey      | `#808080ff` | [<font color="#808080">■■■■■■</font>] |
-| lightblue | `#add8e6ff` | [<font color="#add8e6">■■■■■■</font>] |
-| lime      | `#00ff00ff` | [<font color="#00ff00">■■■■■■</font>] |
-| magenta   | `#ff00ffff` | [<font color="#ff00ff">■■■■■■</font>] |
-| maroon    | `#800000ff` | [<font color="#800000">■■■■■■</font>] |
-| navy      | `#000080ff` | [<font color="#000080">■■■■■■</font>] |
-| olive     | `#808000ff` | [<font color="#808000">■■■■■■</font>] |
-| orange    | `#ffa500ff` | [<font color="#ffa500">■■■■■■</font>] |
-| purple    | `#800080ff` | [<font color="#800080">■■■■■■</font>] |
-| red	    | `#ff0000ff` | [<font color="#ff0000">■■■■■■</font>] |
-| silver    | `#c0c0c0ff` | [<font color="#c0c0c0">■■■■■■</font>] |
-| teal      | `#008080ff` | [<font color="#008080">■■■■■■</font>] |
-| white     | `#ffffffff` | [<font color="#ffffff">■■■■■■</font>] |
-| yellow    | `#ffff00ff` | [<font color="#ffff00">■■■■■■</font>] |
+|-----------|:-----------:|:---------------------------------:|
+| aqua      | `#00ffffff` | ![](https://placehold.it/15/00ffff/000000?text=+) |
+| black     | `#000000ff` | ![](https://placehold.it/15/000000/000000?text=+) |
+| blue      | `#0000ffff` | ![](https://placehold.it/15/0000ff/000000?text=+) |
+| brown     | `#a52a2aff` | ![](https://placehold.it/15/a52a2a/000000?text=+) |
+| cyan      | `#00ffffff` | ![](https://placehold.it/15/00ffff/000000?text=+) |
+| darkblue  | `#0000a0ff` | ![](https://placehold.it/15/0000a0/000000?text=+) |
+| fuchsia   | `#ff00ffff` | ![](https://placehold.it/15/ff00ff/000000?text=+) |
+| green     | `#008000ff` | ![](https://placehold.it/15/008000/000000?text=+) |
+| grey      | `#808080ff` | ![](https://placehold.it/15/808080/000000?text=+) |
+| lightblue | `#add8e6ff` | ![](https://placehold.it/15/add8e6/000000?text=+) |
+| lime      | `#00ff00ff` | ![](https://placehold.it/15/00ff00/000000?text=+) |
+| magenta   | `#ff00ffff` | ![](https://placehold.it/15/ff00ff/000000?text=+) |
+| maroon    | `#800000ff` | ![](https://placehold.it/15/800000/000000?text=+) |
+| navy      | `#000080ff` | ![](https://placehold.it/15/000080/000000?text=+) |
+| olive     | `#808000ff` | ![](https://placehold.it/15/808000/000000?text=+) |
+| orange    | `#ffa500ff` | ![](https://placehold.it/15/ffa500/000000?text=+) |
+| purple    | `#800080ff` | ![](https://placehold.it/15/800080/000000?text=+) |
+| red	    | `#ff0000ff` | ![](https://placehold.it/15/ff0000/000000?text=+) |
+| silver    | `#c0c0c0ff` | ![](https://placehold.it/15/c0c0c0/000000?text=+) |
+| teal      | `#008080ff` | ![](https://placehold.it/15/008080/000000?text=+) |
+| white     | `#ffffffff` | ![](https://placehold.it/15/ffffff/000000?text=+) |
+| yellow    | `#ffff00ff` | ![](https://placehold.it/15/ffff00/000000?text=+) |
 
 # Usage
 The RichText library will create gui text nodes representing the markup in the text passed to the library. It will search for tags and split the entire text into words, where each word contains additional meta-data that is used to create and configure text nodes. This means that the library will create as many text nodes as there are words in the text. Example:
