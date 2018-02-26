@@ -90,7 +90,7 @@ The RichText library will create gui text nodes representing the markup in the t
 ### richtext.create(text, settings)
 Creates rich text gui nodes from a text containing markup.
 
-** PARAMETERS **
+*** PARAMETERS ***
 * `text` (string) - The text to create rich text from
 * `font` (string) - Name of default font. Must match the name of a font in the gui scene.
 * `settings` (table) - Optional table containing settings
@@ -102,5 +102,5 @@ The `settings` table can contain the following values:
 * `parent` (node) - GUI nodes will be attached to this node if specified.
 * `fonts` (table) - Table with fonts, keyed on font name. Each entry should be a table with mappings to fonts for different font styles. Accepted keys are `regular`, `italic`, `bold`, `bold_italic`.
 
-** PARAMETERS **
+*** RETURNS ***
 * `nodes` (table) - A table with all the gui text nodes used to create the text
