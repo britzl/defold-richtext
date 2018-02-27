@@ -22,6 +22,15 @@ Nested elements are supported. Use this to give a section of text a combination 
 
 This is a <b>bold <i>italic</i></b> statement!
 
+### Important note about nested elements!
+It is currently not possible to nest elements of the same tag. This means that the following will not work:
+
+	This <color=green>will <color=red>not</color> work</color>
+
+A workaround is to do like this instead:
+
+	This <color=green>will</color> <color=red>not</color> <color=green>work</color>
+
 ## Supported tags
 The following tags are supported:
 
@@ -109,6 +118,7 @@ The `settings` table can contain the following values:
 * `position` (vector3) - Top-left corner of the first letter of the text. Text will flow from left to right and top to bottom from this position
 * `parent` (node) - GUI nodes will be attached to this node if specified.
 * `fonts` (table) - Table with fonts, keyed on font name. Each entry should be a table with mappings to fonts for different font styles. Accepted keys are `regular`, `italic`, `bold`, `bold_italic`.
+* `color` (vector4) - The default color of text. Will be white if not specified.
 
 **RETURNS**
 * `nodes` (table) - A table with all the gui text nodes used to create the text
