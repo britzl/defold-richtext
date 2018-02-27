@@ -31,7 +31,12 @@ local function get_font(word, fonts)
 	return font
 end
 
-
+--- Create rich text gui nodes from text
+-- @param text The text to create rich text nodes from
+-- @param font The default font
+-- @param settings Optional settings table (refer to documentation for details)
+-- @return words
+-- @return metrics
 function M.create(text, font, settings)
 	assert(text)
 	assert(font)
@@ -120,6 +125,10 @@ function M.create(text, font, settings)
 end
 
 
+--- Get all words with a specific tag
+-- @param words The words to search (as received from richtext.create)
+-- @param tag The tag to search for. Nil to search for words without a tag
+-- @return Words matching the tag
 function M.tagged(words, tag)
 	local tagged = {}
 	for i=1,#words do
