@@ -1,7 +1,0 @@
-local richtext = require "richtext.parse"
-
-local TEXT = "some <p>text</p> and the end"
-
-function init(self)
-	richtext.parse(TEXT)
-end
