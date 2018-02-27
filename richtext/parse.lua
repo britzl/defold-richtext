@@ -3,7 +3,7 @@ local color = require "richtext.color"
 local M = {}
 
 local function parse_tag(tag, params)
-	local settings = {}
+	local settings = { tags = { [tag] = true } }
 	if tag == "color" then
 		settings.color = color.parse(params)
 	elseif tag == "font" then
@@ -30,6 +30,9 @@ end
 
 -- split a line into words
 local function split_line(line, settings, words)
+	assert(line)
+	assert(settings)
+	assert(words)
 	local ws_start, trimmed_text, ws_end = line:match("^(%s*)(.-)(%s*)$")
 	if trimmed_text == "" then
 		add_word(ws_start .. ws_end, settings, words)
@@ -48,6 +51,9 @@ end
 -- split text
 -- split by lines first
 local function split_text(text, settings, words)
+	assert(text)
+	assert(settings)
+	assert(words)
 	local added_linebreak = false
 	if text:sub(-1)~="\n" then
 		added_linebreak = true
@@ -66,9 +72,12 @@ local function split_text(text, settings, words)
 	end
 end
 
-local function find_tag(s)
+-- find tag in text
+-- return the tag, tag params and any text before and after the tag
+local function find_tag(text)
+	assert(text)
 	-- find tag, end if no tag was found
-	local before_start_tag, tag, after_start_tag = s:match("(.-)(<[^/]%S->)(.*)")
+	local before_start_tag, tag, after_start_tag = text:match("(.-)(<[^/]%S->)(.*)")
 	if not before_start_tag or not tag or not after_start_tag then
 		return nil
 	end
@@ -87,35 +96,39 @@ local function find_tag(s)
 	end
 end
 
-function M.parse(s, parent_settings)
-	parent_settings = parent_settings or {}
+function M.parse(text, word_settings)
+	assert(text)
+	assert(word_settings)
 	local all_words = {}
 	while true do
-		local before, tag, params, text, after = find_tag(s)
+		local before, tag, params, text_in_tag, after = find_tag(text)
 		-- no more tags? Split and add the entire string
 		if not tag then
-			split_text(s, parent_settings, all_words)
+			split_text(text, word_settings, all_words)
 			break
 		end
 
 		-- split and add text before the encountered tag
 		if before ~= "" then
-			split_text(before, parent_settings, all_words)
+			split_text(before, word_settings, all_words)
 		end
 
-		-- parse the tag and merge it with settings for the parent tag
+		-- parse the tag and merge settings
 		local tag_settings = parse_tag(tag, params)
-		for k,v in pairs(parent_settings) do
-			tag_settings[k] = v
+		for k,v in pairs(word_settings) do
+			tag_settings[k] = tag_settings[k] or v
+		end
+		for tag,_ in pairs(word_settings.tags or {}) do
+			tag_settings.tags[tag] = true
 		end
 
-		-- parse the text inside the tag and add the words
-		local inner_words = M.parse(text, tag_settings)
+		-- parse the text in the tag and add the words
+		local inner_words = M.parse(text_in_tag, tag_settings)
 		for _,word in ipairs(inner_words) do
 			all_words[#all_words + 1] = word
 		end
 		
-		s = after
+		text = after
 	end
 	return all_words
 end

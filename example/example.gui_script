@@ -22,8 +22,15 @@ function init(self)
 	}
 
 	print(TEXT)
-	local nodes, metrics = richtext.create(TEXT, "Roboto", settings)
+	local words, metrics = richtext.create(TEXT, "Roboto", settings)
 
 	-- adjust background to cover text
 	gui.set_size(settings.parent, vmath.vector3(metrics.width, metrics.height, 0))
+
+	-- get all bold words and animate them
+	local bold_words = richtext.tagged(words, "b")
+	for _,bold_word in pairs(bold_words) do
+		local pos = gui.get_position(bold_word.node)
+		gui.animate(bold_word.node, gui.PROP_POSITION, pos + vmath.vector3(0, 4, 0), gui.EASING_INOUTQUAD, 4, ((pos.x * pos.y) % 10) / 10, nil, gui.PLAYBACK_LOOP_PINGPONG)
+	end
 end

@@ -7,9 +7,9 @@ local function get_trailing_whitespace(text)
 	return text:match("^.-(%s*)$") or ""
 end
 
-local function get_font(word, settings)
-	local font_name = word.font or settings.font
-	local font_settings = settings.fonts[font_name]
+
+local function get_font(word, fonts)
+	local font_settings = fonts[word.font]
 	local font = nil
 	if font_settings then
 		if word.bold and word.italic then
@@ -26,49 +26,43 @@ local function get_font(word, settings)
 		end
 	end
 	if not font then
-		font = settings.font
+		font = word.font
 	end
 	return font
 end
+
 
 function M.create(text, font, settings)
 	assert(text)
 	assert(font)
 	settings = settings or {}
-	settings.font = font
 	settings.fonts = settings.fonts or {}
-	if not settings.fonts[font] then
-		settings.fonts[font] = {
-			regular = hash(font)
-		}
-	end
+	settings.fonts[font] = settings.fonts[font] or { regular = hash(font) }
 	settings.color = settings.color or vmath.vector4(1)
 	settings.position = settings.position or vmath.vector3()
 
 	-- cache length of a single space, per font
 	local font_sizes = {}
 
-	local position = vmath.vector3(settings.position)
-	
-	local words = parser.parse(text)
+	local word_settings = {
+		color = settings.color,
+		font = font,
+		size = 1
+	}
+	local words = parser.parse(text, word_settings)
 	local highest_word = 0
 	local text_metrics = {
 		width = 0,
 		height = 0,
 	}
-	local nodes = {}
+	local position = vmath.vector3(settings.position)
 	for _,word in pairs(words) do
-		-- assign defaults if needed
-		word.color = word.color or settings.color
-		word.font = word.font or settings.font
-		word.size = word.size or 1
-
 		-- get font to use based on word tags
-		local font = get_font(word, settings)
+		local font = get_font(word, settings.fonts)
 
 		-- create and configure text node
 		local node = gui.new_text_node(vmath.vector3(0), word.text)
-		nodes[#nodes + 1] = node
+		word.node = node
 		if settings.parent then
 			gui.set_parent(node, settings.parent)
 		end
@@ -122,9 +116,22 @@ function M.create(text, font, settings)
 
 	end
 
-	return nodes, text_metrics
+	return words, text_metrics
 end
 
+
+function M.tagged(words, tag)
+	local tagged = {}
+	for i=1,#words do
+		local word = words[i]
+		if not tag and not word.tags then
+			tagged[#tagged + 1] = word
+		elseif word.tags and word.tags[tag] then
+			tagged[#tagged + 1] = word
+		end
+	end
+	return tagged
+end
 
 
 return M

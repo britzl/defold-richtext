@@ -93,11 +93,12 @@ The RichText library will create gui text nodes representing the markup in the t
 		width = 400,
 		position = vmath.vector3(0, 0, 0),
 		parent = gui.get_node("parent"),
+		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
 	}
 
-	local text = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color>dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>. Nullam ornare accumsan rhoncus. Nunc placerat nibh a purus auctor, id scelerisque massa rutrum."
+	local text = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color>dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
 
-	self.nodes = richtext.create(text, "Roboto", settings)
+	richtext.create(text, "Roboto", settings)
 
 This would result in the following output:
 
@@ -121,5 +122,15 @@ The `settings` table can contain the following values:
 * `color` (vector4) - The default color of text. Will be white if not specified.
 
 **RETURNS**
-* `nodes` (table) - A table with all the gui text nodes used to create the text
+* `words` (table) - A table with all the words that the text has been broken up into. Each word is represented by a table with keys such as `node`, `tags`, `text` etc
 * `metrics` (table) - A table with text metrics. Contains the keys `width` and `height`.
+
+### richtext.tagged(words, tag)
+Get all words with a specific tag.
+
+**PARAMETERS**
+* `words` (table) - The words to search, as received by a call to `richtext.create()`.
+* `tag` (string) - Name of the tag to search for. Pass `nil` to get all words without tags.
+
+**RETURNS**
+* `words` (table) - A table with all the words that matches the tag.
