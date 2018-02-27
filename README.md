@@ -122,3 +122,4 @@ The `settings` table can contain the following values:
 
 **RETURNS**
 * `nodes` (table) - A table with all the gui text nodes used to create the text
+* `metrics` (table) - A table with text metrics. Contains the keys `width` and `height`.

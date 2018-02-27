@@ -1,6 +1,6 @@
 local richtext = require "richtext.richtext"
 
-local TEXT = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color>dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa rutrum."
+local TEXT = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color>dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
 
 function init(self)
 	local settings = {
@@ -17,9 +17,13 @@ function init(self)
 		},
 		width = 400,
 		position = vmath.vector3(0, 0, 0),
-		parent = gui.get_node("parent"),
+		parent = gui.get_node("bg"),
+		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
 	}
 
 	print(TEXT)
-	self.nodes = richtext.create(TEXT, "Roboto", settings)
+	local nodes, metrics = richtext.create(TEXT, "Roboto", settings)
+
+	-- adjust background to cover text
+	gui.set_size(settings.parent, vmath.vector3(metrics.width, metrics.height, 0))
 end

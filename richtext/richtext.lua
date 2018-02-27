@@ -52,6 +52,10 @@ function M.create(text, font, settings)
 	
 	local words = parser.parse(text)
 	local highest_word = 0
+	local text_metrics = {
+		width = 0,
+		height = 0,
+	}
 	local nodes = {}
 	for _,word in pairs(words) do
 		-- assign defaults if needed
@@ -73,7 +77,7 @@ function M.create(text, font, settings)
 		gui.set_color(node, word.color)
 		gui.set_scale(node, vmath.vector3(1) * (word.size or 1))
 
-		-- measure width of a single space for current font
+		-- cache some font measurements for the current font
 		if not font_sizes[font] then
 			font_sizes[font] = {
 				space = gui.get_text_metrics(font, " _").width - gui.get_text_metrics(font, "_").width,
@@ -81,24 +85,32 @@ function M.create(text, font, settings)
 			}
 		end
 
-		-- get metrics of node
+		-- get metrics of node with and without trailing whitespace
 		word.metrics = gui.get_text_metrics_from_node(node)
 		word.metrics.total_width = (word.metrics.width + #get_trailing_whitespace(word.text) * font_sizes[font].space) * word.size
 		word.metrics.width = word.metrics.width * word.size
 		word.metrics.height = word.metrics.height * word.size
-		highest_word = math.max(highest_word, word.metrics.height)
+
+		-- update text metrics width
+		local current_width = position.x - settings.position.x
+		text_metrics.width = math.max(text_metrics.width, current_width)
 
 		-- move word to next row if it overflows the width
-		local width = position.x + word.metrics.width - settings.position.x
+		local width = current_width + word.metrics.width
 		if settings.width and width > settings.width then
 			position.y = position.y - highest_word
 			position.x = settings.position.x
-			highest_word = font_sizes[font].height
+			highest_word = word.metrics.height
+		else
+			highest_word = math.max(highest_word, word.metrics.height)
 		end
 
 		-- position word
 		gui.set_position(node, position)
 
+		-- update text metrics height
+		text_metrics.height = (settings.position.y - (position.y - highest_word))
+		
 		-- handle linebreak or advance on same line
 		if word.linebreak then
 			position.y = position.y - highest_word
@@ -107,9 +119,10 @@ function M.create(text, font, settings)
 		else
 			position.x = position.x + word.metrics.total_width
 		end
+
 	end
 
-	return nodes
+	return nodes, text_metrics
 end
 
 
