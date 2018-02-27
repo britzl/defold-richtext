@@ -1,51 +1,11 @@
+local color = require "richtext.color"
+
 local M = {}
-
-local function parse_color(c)
-	local r,g,b,a = c:match("#(%x%x)(%x%x)(%x%x)(%x%x)")
-	if r and g and b and a then
-		return vmath.vector4(tonumber(r, 16) / 255, tonumber(g, 16) / 255, tonumber(b, 16) / 255, tonumber(a, 16) / 255)
-	end
-	local r,g,b,a = c:match("(%d*%.?%d*),(%d*%.?%d*),(%d*%.?%d*),(%d*%.?%d*)")
-	if r and g and b and a then
-		return vmath.vector4(tonumber(r), tonumber(g), tonumber(b), tonumber(a))
-	end
-	return nil
-end
-
-
-local COLORS = {
-	aqua = parse_color("#00ffffff"),
-	black = parse_color("#000000ff"),
-	blue = parse_color("#0000ffff"),
-	brown = parse_color("#a52a2aff"),
-	cyan = parse_color("#00ffffff"),
-	darkblue = parse_color("#0000a0ff"),
-	fuchsia = parse_color("#ff00ffff"),
-	green = parse_color("#008000ff"),
-	grey = parse_color("#808080ff"),
-	lightblue = parse_color("#add8e6ff"),
-	lime = parse_color("#00ff00ff"),
-	magenta = parse_color("#ff00ffff"),
-	maroon = parse_color("#800000ff"),
-	navy = parse_color("#000080ff"),
-	olive = parse_color("#808000ff"),
-	orange = parse_color("#ffa500ff"),
-	purple = parse_color("#800080ff"),
-	red	 = parse_color("#ff0000ff"),
-	silver = parse_color("#c0c0c0ff"),
-	teal = parse_color("#008080ff"),
-	white = parse_color("#ffffffff"),
-	yellow = parse_color("#ffff00ff"),
-}
-
 
 local function parse_tag(tag, params)
 	local settings = {}
 	if tag == "color" then
-		settings.color = COLORS[params]
-		if not settings.color then
-			settings.color = parse_color(params)
-		end
+		settings.color = color.parse(params)
 	elseif tag == "font" then
 		settings.font = params
 	elseif tag == "size" then
