@@ -14,6 +14,8 @@ local function parse_tag(tag, params)
 		settings.bold = true
 	elseif tag == "i" then
 		settings.italic = true
+	elseif tag == "br" then
+		settings.linebreak = true
 	elseif tag == "img" then
 		local texture, anim = params:match("(.-):(.*)")
 		settings.image = {
@@ -60,18 +62,29 @@ local function split_text(text, settings, words)
 	assert(text)
 	assert(settings)
 	assert(words)
+
+	-- special treatment of empty text with a linebreak <br/>
+	if text == "" and settings.linebreak then
+		add_word(text, settings, words)
+		return
+	end
+
+	-- the Lua pattern expects the text to have a linebreak at the end
 	local added_linebreak = false
 	if text:sub(-1)~="\n" then
 		added_linebreak = true
 		text = text .. "\n"
 	end
 
+	-- split into lines
 	for line in text:gmatch("(.-)\n") do
 		split_line(line, settings, words)
+		-- flag last word of a line as having a linebreak
 		local last = words[#words]
 		last.linebreak = true
 	end
 
+	-- remove the last linebreak if we manually added it above
 	if added_linebreak then
 		local last = words[#words]
 		last.linebreak = false
@@ -83,13 +96,19 @@ end
 local function find_tag(text)
 	assert(text)
 	-- find tag, end if no tag was found
-	local before_start_tag, tag, after_start_tag = text:match("(.-)(<[^/]%S->)(.*)")
+	local before_start_tag, tag, after_start_tag = text:match("(.-)(</?%S->)(.*)")
 	if not before_start_tag or not tag or not after_start_tag then
 		return nil
 	end
 	
 	-- parse the tag, split into name and optional parameters
-	local name, params = tag:match("<(%a+)=?(%S*)>")
+	local name, params, empty = tag:match("<(%a+)=?(%S-)(/?)>")
+
+	-- empty tag, ie tag without content
+	-- example <br/> and <img=texture:image/>
+	if empty == "/" then
+		return before_start_tag, name, params, "", after_start_tag
+	end
 
 	-- find end tag
 	local inside_tag, after_end_tag = after_start_tag:match("(.-)</" .. name .. ">(.*)")

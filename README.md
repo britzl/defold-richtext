@@ -45,7 +45,11 @@ The following tags are supported:
 |       |                                                | `<color=1.0,0.5,0,1.0>Foobar</color>` |
 |       |                                                | `<color=#ff00ffff>Foobar</color>`     |
 | font  | Change font                                    | `<font=MyCoolFont>Foobar</font>`      |
-| img   | Display image                                  | `<img=texture:image></img>`           |
+| img   | Display image                                  | `<img=texture:image/>`                |
+| br    | Insert a line break (see notes on linebreak)   | `<br/>`                               |
+
+### Line breaks
+Note that there is no need for the HTML `<br/>` tag since line breaks (i.e. `\n`) are parsed and presented by the system.
 
 ### Named colors
 The following named colors are supported:
@@ -75,9 +79,6 @@ The following named colors are supported:
 | white     | `#ffffffff` | ![](https://placehold.it/15/ffffff/000000?text=+) |
 | yellow    | `#ffff00ff` | ![](https://placehold.it/15/ffff00/000000?text=+) |
 
-## Line breaks
-There is no need for the HTML `<br>` tag since line breaks (i.e. `\n`) are parsed and presented by the system.
-
 # Usage
 The RichText library will create gui text nodes representing the markup in the text passed to the library. It will search for tags and split the entire text into words, where each word contains additional meta-data that is used to create and configure text nodes. This means that the library will create as many text nodes as there are words in the text. Example:
 
@@ -99,7 +100,7 @@ The RichText library will create gui text nodes representing the markup in the t
 		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
 	}
 
-	local text = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie></img> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry></img>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
+	local text = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry/>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
 
 	richtext.create(text, "Roboto", settings)
 
