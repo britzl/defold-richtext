@@ -90,18 +90,18 @@ function M.create(text, font, settings)
 		word.metrics.width = word.metrics.width * word.size
 		word.metrics.height = word.metrics.height * word.size
 
-		-- update text metrics width
-		local current_width = position.x - settings.position.x
-		text_metrics.width = math.max(text_metrics.width, current_width)
 
 		-- move word to next row if it overflows the width
+		local current_width = position.x - settings.position.x
 		local width = current_width + word.metrics.width
 		if settings.width and width > settings.width then
 			position.y = position.y - highest_word
 			position.x = settings.position.x
 			highest_word = word.metrics.height
+			text_metrics.width = math.max(text_metrics.width, current_width)
 		else
 			highest_word = math.max(highest_word, word.metrics.height)
+			text_metrics.width = math.max(text_metrics.width, width)
 		end
 
 		-- position word
