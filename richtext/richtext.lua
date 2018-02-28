@@ -2,6 +2,8 @@ local parser = require "richtext.parse"
 
 local M = {}
 
+local V3_ZERO = vmath.vector3(0)
+local V3_ONE = vmath.vector3(1)
 
 local function get_trailing_whitespace(text)
 	return text:match("^.-(%s*)$") or ""
@@ -62,20 +64,10 @@ function M.create(text, font, settings)
 	}
 	local position = vmath.vector3(settings.position)
 	for _,word in pairs(words) do
+		--print("word: [" .. word.text .. "]")
+
 		-- get font to use based on word tags
 		local font = get_font(word, settings.fonts)
-
-		-- create and configure text node
-		local node = gui.new_text_node(vmath.vector3(0), word.text)
-		word.node = node
-		if settings.parent then
-			gui.set_parent(node, settings.parent)
-		end
-		gui.set_font(node, font)
-		gui.set_pivot(node, gui.PIVOT_NW)
-		gui.set_color(node, word.color)
-		gui.set_scale(node, vmath.vector3(1) * (word.size or 1))
-
 		-- cache some font measurements for the current font
 		if not font_sizes[font] then
 			font_sizes[font] = {
@@ -83,13 +75,39 @@ function M.create(text, font, settings)
 				height = gui.get_text_metrics(font, "Ij").height,
 			}
 		end
+		
+		-- create and configure node
+		local node
+		if word.image then
+			node = gui.new_box_node(V3_ZERO, V3_ZERO)
+			gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
+			gui.set_texture(node, word.image.texture)
+			gui.play_flipbook(node, hash(word.image.anim))
 
-		-- get metrics of node with and without trailing whitespace
-		word.metrics = gui.get_text_metrics_from_node(node)
-		word.metrics.total_width = (word.metrics.width + #get_trailing_whitespace(word.text) * font_sizes[font].space) * word.size
-		word.metrics.width = word.metrics.width * word.size
-		word.metrics.height = word.metrics.height * word.size
+			-- get metrics of node based on image size
+			local image_size = gui.get_size(node)
+			word.metrics = {}
+			word.metrics.total_width = image_size.x
+			word.metrics.width = image_size.x
+			word.metrics.height = image_size.y
+		else
+			node = gui.new_text_node(V3_ZERO, word.text)
+			gui.set_font(node, font)
+			gui.set_color(node, word.color)
+			gui.set_scale(node, V3_ONE * (word.size or 1))
 
+			-- get metrics of node with and without trailing whitespace
+			word.metrics = gui.get_text_metrics_from_node(node)
+			word.metrics.total_width = (word.metrics.width + #get_trailing_whitespace(word.text) * font_sizes[font].space) * word.size
+			word.metrics.width = word.metrics.width * word.size
+			word.metrics.height = word.metrics.height * word.size
+		end
+		
+		word.node = node
+		if settings.parent then
+			gui.set_parent(node, settings.parent)
+		end
+		gui.set_pivot(node, gui.PIVOT_NW)
 
 		-- move word to next row if it overflows the width
 		local current_width = position.x - settings.position.x

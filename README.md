@@ -1,12 +1,14 @@
 # Defold-RichText
 Defold-RichText is a system to create styled text based on an HTML inspired markup language.
 
+
 # Installation
 You can use RichText in your own project by adding this project as a [Defold library dependency](http://www.defold.com/manuals/libraries/). Open your game.project file and in the dependencies field under project add:
 
 https://github.com/britzl/defold-richtext/archive/master.zip
 
 Or point to the ZIP file of a [specific release](https://github.com/britzl/defold-richtext/releases).
+
 
 # Markup format
 The markup format is HTML inspired, but not intended to be fully compatible with standard HTML. Just like in HTML the idea is that sections of text can be enclosed in matching start and end tags:
@@ -43,6 +45,7 @@ The following tags are supported:
 |       |                                                | `<color=1.0,0.5,0,1.0>Foobar</color>` |
 |       |                                                | `<color=#ff00ffff>Foobar</color>`     |
 | font  | Change font                                    | `<font=MyCoolFont>Foobar</font>`      |
+| img   | Display image                                  | `<img=texture:image></img>`           |
 
 ### Named colors
 The following named colors are supported:
@@ -92,11 +95,11 @@ The RichText library will create gui text nodes representing the markup in the t
 		},
 		width = 400,
 		position = vmath.vector3(0, 0, 0),
-		parent = gui.get_node("parent"),
+		parent = gui.get_node("bg"),
 		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
 	}
 
-	local text = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color>dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
+	local text = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie></img> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry></img>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
 
 	richtext.create(text, "Roboto", settings)
 
@@ -104,7 +107,8 @@ This would result in the following output:
 
 ![](docs/example.png)
 
-## API
+
+# API
 ### richtext.create(text, settings)
 Creates rich text gui nodes from a text containing markup.
 
@@ -134,3 +138,7 @@ Get all words with a specific tag.
 
 **RETURNS**
 * `words` (table) - A table with all the words that matches the tag.
+
+
+# Credits
+* Smiley icons in example app from [Flaticons](https://www.flaticon.com/packs/smileys-3)

@@ -14,6 +14,12 @@ local function parse_tag(tag, params)
 		settings.bold = true
 	elseif tag == "i" then
 		settings.italic = true
+	elseif tag == "img" then
+		local texture, anim = params:match("(.-):(.*)")
+		settings.image = {
+			texture = texture,
+			anim = anim
+		}
 	end
 
 	return settings

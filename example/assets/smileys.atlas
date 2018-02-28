@@ -1,0 +1,192 @@
+images {
+  image: "/example/assets/images/smileys/angel.png"
+}
+images {
+  image: "/example/assets/images/smileys/angry.png"
+}
+images {
+  image: "/example/assets/images/smileys/baby.png"
+}
+images {
+  image: "/example/assets/images/smileys/bang.png"
+}
+images {
+  image: "/example/assets/images/smileys/book.png"
+}
+images {
+  image: "/example/assets/images/smileys/bored.png"
+}
+images {
+  image: "/example/assets/images/smileys/cheering.png"
+}
+images {
+  image: "/example/assets/images/smileys/confused.png"
+}
+images {
+  image: "/example/assets/images/smileys/cool.png"
+}
+images {
+  image: "/example/assets/images/smileys/crying.png"
+}
+images {
+  image: "/example/assets/images/smileys/cyclops.png"
+}
+images {
+  image: "/example/assets/images/smileys/dead.png"
+}
+images {
+  image: "/example/assets/images/smileys/drool.png"
+}
+images {
+  image: "/example/assets/images/smileys/dubious.png"
+}
+images {
+  image: "/example/assets/images/smileys/easter.png"
+}
+images {
+  image: "/example/assets/images/smileys/father.png"
+}
+images {
+  image: "/example/assets/images/smileys/flower.png"
+}
+images {
+  image: "/example/assets/images/smileys/furious.png"
+}
+images {
+  image: "/example/assets/images/smileys/graduated.png"
+}
+images {
+  image: "/example/assets/images/smileys/greed.png"
+}
+images {
+  image: "/example/assets/images/smileys/happy.png"
+}
+images {
+  image: "/example/assets/images/smileys/heart.png"
+}
+images {
+  image: "/example/assets/images/smileys/hungry.png"
+}
+images {
+  image: "/example/assets/images/smileys/hypnotized.png"
+}
+images {
+  image: "/example/assets/images/smileys/injury.png"
+}
+images {
+  image: "/example/assets/images/smileys/kiss.png"
+}
+images {
+  image: "/example/assets/images/smileys/late.png"
+}
+images {
+  image: "/example/assets/images/smileys/laughing.png"
+}
+images {
+  image: "/example/assets/images/smileys/moon.png"
+}
+images {
+  image: "/example/assets/images/smileys/music.png"
+}
+images {
+  image: "/example/assets/images/smileys/muted.png"
+}
+images {
+  image: "/example/assets/images/smileys/nerd.png"
+}
+images {
+  image: "/example/assets/images/smileys/nervous.png"
+}
+images {
+  image: "/example/assets/images/smileys/nurse.png"
+}
+images {
+  image: "/example/assets/images/smileys/outrage.png"
+}
+images {
+  image: "/example/assets/images/smileys/pain.png"
+}
+images {
+  image: "/example/assets/images/smileys/pirate.png"
+}
+images {
+  image: "/example/assets/images/smileys/police.png"
+}
+images {
+  image: "/example/assets/images/smileys/popcorn.png"
+}
+images {
+  image: "/example/assets/images/smileys/rich.png"
+}
+images {
+  image: "/example/assets/images/smileys/robot.png"
+}
+images {
+  image: "/example/assets/images/smileys/sad.png"
+}
+images {
+  image: "/example/assets/images/smileys/scared.png"
+}
+images {
+  image: "/example/assets/images/smileys/selfie.png"
+}
+images {
+  image: "/example/assets/images/smileys/shocked.png"
+}
+images {
+  image: "/example/assets/images/smileys/sick.png"
+}
+images {
+  image: "/example/assets/images/smileys/sleeping.png"
+}
+images {
+  image: "/example/assets/images/smileys/sleepy.png"
+}
+images {
+  image: "/example/assets/images/smileys/smart.png"
+}
+images {
+  image: "/example/assets/images/smileys/smile.png"
+}
+images {
+  image: "/example/assets/images/smileys/star.png"
+}
+images {
+  image: "/example/assets/images/smileys/sun.png"
+}
+images {
+  image: "/example/assets/images/smileys/surprised.png"
+}
+images {
+  image: "/example/assets/images/smileys/sweat.png"
+}
+images {
+  image: "/example/assets/images/smileys/thief.png"
+}
+images {
+  image: "/example/assets/images/smileys/thinking.png"
+}
+images {
+  image: "/example/assets/images/smileys/tired.png"
+}
+images {
+  image: "/example/assets/images/smileys/tongue.png"
+}
+images {
+  image: "/example/assets/images/smileys/ugly.png"
+}
+images {
+  image: "/example/assets/images/smileys/vampire.png"
+}
+images {
+  image: "/example/assets/images/smileys/whistle.png"
+}
+images {
+  image: "/example/assets/images/smileys/wink.png"
+}
+images {
+  image: "/example/assets/images/smileys/zombie.png"
+}
+margin: 0
+extrude_borders: 1
+inner_padding: 0
