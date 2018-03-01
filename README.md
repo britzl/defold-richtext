@@ -49,7 +49,7 @@ The following tags are supported:
 | br    | Insert a line break (see notes on linebreak)   | `<br/>`                               |
 
 ### Line breaks
-Note that there is no need for the HTML `<br/>` tag since line breaks (i.e. `\n`) are parsed and presented by the system.
+Note that there is no need for the HTML `<br/>` tag since line breaks (i.e. `\n`) are parsed and presented by the system. Note that a single `<br>` (ie without a closing or empty tag) isn't supported (even though most browsers accept it).
 
 ### Named colors
 The following named colors are supported:
