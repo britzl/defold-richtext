@@ -82,13 +82,14 @@ The following named colors are supported:
 # Usage
 The RichText library will create gui text nodes representing the markup in the text passed to the library. It will search for tags and split the entire text into words, where each word contains additional meta-data that is used to create and configure text nodes. This means that the library will create as many text nodes as there are words in the text.
 
-## Basic usage
+## Basic example
 A simple example with some color and linebreaks:
 
 	richtext.create("Single line text with a dash of <color=red>color</color>\nBy default left aligned.", "Roboto-Regular")
 
 ![](docs/basic.png)
 
+## Advanced example
 A more complex example with different fonts, colors, inline images and automatic linebreaks:
 
 	local settings = {
