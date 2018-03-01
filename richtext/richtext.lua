@@ -107,7 +107,7 @@ function M.create(text, font, settings)
 	local text_metrics = {
 		width = 0,
 		height = 0,
-		char_count = parser.count_characters(text),
+		char_count = parser.length(text),
 	}
 	local line_words = {}
 	local line_width = 0
