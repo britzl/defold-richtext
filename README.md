@@ -133,7 +133,7 @@ The `settings` table can contain the following values:
 * `parent` (node) - GUI nodes will be attached to this node if specified.
 * `fonts` (table) - Table with fonts, keyed on font name. Each entry should be a table with mappings to fonts for different font styles. Accepted keys are `regular`, `italic`, `bold`, `bold_italic`. If no `fonts` table is provided the font used will be the one passed to `richtext.create()`.
 * `color` (vector4) - The default color of text. Will be white if not specified.
-* `align` (hash) - One of `richtext_ALIGN_LEFT`, `richtext_ALIGN_CENTER` and `richtext_ALIGN_RIGHT`. Defaults to `richtext.ALIGN_LEFT`. Defines how the words of a line of text are positioned in relation the provided `position`.
+* `align` (hash) - One of `richtext.ALIGN_LEFT`, `richtext.ALIGN_CENTER` and `richtext.ALIGN_RIGHT`. Defaults to `richtext.ALIGN_LEFT`. Defines how the words of a line of text are positioned in relation the provided `position`.
 
 **RETURNS**
 * `words` (table) - A table with all the words that the text has been broken up into. Each word is represented by a table with keys such as `node`, `tags`, `text` etc
