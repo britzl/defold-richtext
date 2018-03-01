@@ -129,7 +129,7 @@ Creates rich text gui nodes from a text containing markup.
 The `settings` table can contain the following values:
 
 * `width` (number) - Maximum width of a line of text. Omit this value to present the entire text on a single line
-* `position` (vector3) - Top-left corner of the first letter of the text. Text will flow from left to right and top to bottom from this position. Defaults to 0,0 if not specified.
+* `position` (vector3) - The position that the text aligns to (refer to the `align` setting for details). Defaults to 0,0 if not specified.
 * `parent` (node) - GUI nodes will be attached to this node if specified.
 * `fonts` (table) - Table with fonts, keyed on font name. Each entry should be a table with mappings to fonts for different font styles. Accepted keys are `regular`, `italic`, `bold`, `bold_italic`. If no `fonts` table is provided the font used will be the one passed to `richtext.create()`.
 * `color` (vector4) - The default color of text. Will be white if not specified.
