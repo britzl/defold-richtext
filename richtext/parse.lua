@@ -159,8 +159,10 @@ function M.parse(text, word_settings)
 end
 
 
-
-
+--- Get the length of a text, excluding any tags (except image tags)
+function M.length(text)
+	return #text:gsub("<img.-/>", " "):gsub("<.->", "")
+end
 
 
 return M

@@ -22,8 +22,10 @@ local function create_complex_example()
 		align = richtext.ALIGN_LEFT
 	}
 	local text = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit.<br/><b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry></img>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
-
+	richtext.length(text)
 	local words, metrics = richtext.create(text, "Roboto", settings)
+
+	print("The text consists of " .. tostring(metrics.char_count) .. " characters")
 
 	-- adjust background to cover text
 	gui.set_size(settings.parent, vmath.vector3(metrics.width, metrics.height, 0))
@@ -45,9 +47,22 @@ local function create_align_example()
 	richtext.create("Center these words around the specified position\nAnd these words as well", "Roboto-Regular", settings_align_center)
 end
 
-function init(self)
-	--create_complex_example()
-	--create_align_example()
 
-	richtext.create("Single line text with a dash of <color=red>color</color>\nBy default left aligned.", "Roboto-Regular", { position = vmath.vector3(100, 100, 0) })
+local function create_truncate_example()
+	local settings = { position = vmath.vector3(0, 260, 0) }
+	local words, metrics = richtext.create("This text should be shown one <img=smileys:cyclops/> at a time...", "Roboto-Regular", settings)
+	pprint(metrics)
+	local length = 0
+	richtext.truncate(words, length)
+	timer.repeating(0.1, function()
+		length = (length + 1) % (metrics.char_count + 1)
+		richtext.truncate(words, length)
+	end)
+end
+
+
+function init(self)
+	create_complex_example()
+	create_align_example()
+	create_truncate_example()
 end

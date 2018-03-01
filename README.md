@@ -137,7 +137,13 @@ The `settings` table can contain the following values:
 
 **RETURNS**
 * `words` (table) - A table with all the words that the text has been broken up into. Each word is represented by a table with keys such as `node`, `tags`, `text` etc
-* `metrics` (table) - A table with text metrics. Contains the keys `width` and `height`.
+* `metrics` (table) - A table with text metrics.
+
+The `metrics` table contains the following values:
+
+* `width` (number) - Width of the text
+* `height` (number) - Height of the text
+* `char_count` (number) - Number of characters in the text including whitespace and images
 
 ### richtext.tagged(words, tag)
 Get all words with a specific tag.
@@ -148,6 +154,24 @@ Get all words with a specific tag.
 
 **RETURNS**
 * `words` (table) - A table with all the words that matches the tag.
+
+
+### richtext.truncate(words, length)
+Truncate a text such that only a specific number of characters and images are visible. The function will disable nodes that shouldn't be seen at all and updates the text in nodes that should be partially visible.
+
+**PARAMETERS**
+* `words` (table) - The words to truncate, as received by a call to `richtext.create()`.
+* `length` (number) - Maximum number of characters or images to show.
+
+
+### richtext.length(text)
+Get the length of a text ignoring any tags except image tags which are treated as having a length of 1.
+
+**PARAMETERS**
+* `text` (string|table) - The text to measure. This can either be a string or a list of words, as received by a call to `richtext.create()`.
+
+**RETURNS**
+* `length` (number) - The length of the provided text.
 
 
 ### richtext.ALIGN_LEFT

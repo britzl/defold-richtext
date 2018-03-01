@@ -57,6 +57,25 @@ local function position_words(words, line_width, position, settings)
 end
 
 
+--- Get the length of a text ignoring any tags except image tags
+-- which are treated as having a length of 1
+-- @param text String with text or a list of words (from richtext.create)
+-- @return Length of text
+function M.length(text)
+	assert(text)
+	if type(text) == "string" then
+		return parser.length(text)
+	else
+		local count = 0
+		for i=1,#text do
+			local word = text[i]
+			count = count + (word.image and 1 or #word.text)
+		end
+		return count
+	end
+end
+
+
 --- Create rich text gui nodes from text
 -- @param text The text to create rich text nodes from
 -- @param font The default font
@@ -76,6 +95,8 @@ function M.create(text, font, settings)
 	-- cache length fonr metrics such as space width and height
 	local font_sizes = {}
 
+	-- default settings for a word
+	-- will be assigned to each word unless tags override the values
 	local word_settings = {
 		color = settings.color,
 		font = font,
@@ -86,6 +107,7 @@ function M.create(text, font, settings)
 	local text_metrics = {
 		width = 0,
 		height = 0,
+		char_count = parser.count_characters(text),
 	}
 	local line_words = {}
 	local line_width = 0
@@ -203,6 +225,34 @@ function M.tagged(words, tag)
 		end
 	end
 	return tagged
+end
+
+
+--- Truncate a set of words such that only a specific number of characters
+-- and images are visible
+-- @param words List of words to truncate
+-- @param length Maximum number of characters to show
+function M.truncate(words, length)
+	assert(words)
+	assert(length)
+	local count = 0
+	for i=1,#words do
+		local word = words[i]
+		local word_length = word.image and 1 or #word.text
+		gui.set_enabled(word.node, count < length)
+		if count < length and not word.image then
+			-- should entire or part of word be visible?
+			if count + word_length <= length then
+				-- entire word
+				gui.set_text(word.node, word.text)
+			else
+				-- partial word
+				local overflow = (count + word_length) - length
+				gui.set_text(word.node, word.text:sub(1, word_length - overflow))
+			end
+		end		
+		count = count + word_length
+	end
 end
 
 
