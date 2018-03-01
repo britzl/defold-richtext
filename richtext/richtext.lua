@@ -2,6 +2,11 @@ local parser = require "richtext.parse"
 
 local M = {}
 
+M.ALIGN_CENTER = hash("ALIGN_CENTER")
+M.ALIGN_LEFT = hash("ALIGN_LEFT")
+M.ALIGN_RIGHT = hash("ALIGN_RIGHT")
+
+
 local V3_ZERO = vmath.vector3(0)
 local V3_ONE = vmath.vector3(1)
 
@@ -33,6 +38,25 @@ local function get_font(word, fonts)
 	return font
 end
 
+
+-- position all words according to the line alignment and line width
+-- the list of words will be empty after this function is called
+local function position_words(words, line_width, position, settings)
+	if settings.align == M.ALIGN_RIGHT then
+		position.x = position.x - line_width
+	elseif settings.align == M.ALIGN_CENTER then
+		position.x = position.x - line_width / 2
+	end
+
+	for i=1,#words do
+		local word = words[i]
+		gui.set_position(word.node, position)
+		position.x = position.x + word.metrics.total_width
+		words[i] = nil
+	end
+end
+
+
 --- Create rich text gui nodes from text
 -- @param text The text to create rich text nodes from
 -- @param font The default font
@@ -43,12 +67,13 @@ function M.create(text, font, settings)
 	assert(text)
 	assert(font)
 	settings = settings or {}
+	settings.align = settings.align or M.ALIGN_LEFT
 	settings.fonts = settings.fonts or {}
 	settings.fonts[font] = settings.fonts[font] or { regular = hash(font) }
-	settings.color = settings.color or vmath.vector4(1)
-	settings.position = settings.position or vmath.vector3()
+	settings.color = settings.color or V3_ONE
+	settings.position = settings.position or V3_ZERO
 
-	-- cache length of a single space, per font
+	-- cache length fonr metrics such as space width and height
 	local font_sizes = {}
 
 	local word_settings = {
@@ -62,8 +87,11 @@ function M.create(text, font, settings)
 		width = 0,
 		height = 0,
 	}
+	local line_words = {}
+	local line_width = 0
 	local position = vmath.vector3(settings.position)
-	for _,word in pairs(words) do
+	for i=1,#words do
+		local word = words[i]
 		--print("word: [" .. word.text .. "]")
 
 		-- get font to use based on word tags
@@ -102,41 +130,58 @@ function M.create(text, font, settings)
 			word.metrics.width = word.metrics.width * word.size
 			word.metrics.height = word.metrics.height * word.size
 		end
-		
+
+		-- store node on word and set it's parent and pivot
 		word.node = node
 		if settings.parent then
 			gui.set_parent(node, settings.parent)
 		end
 		gui.set_pivot(node, gui.PIVOT_NW)
 
-		-- move word to next row if it overflows the width
-		local current_width = position.x - settings.position.x
-		local width = current_width + word.metrics.width
-		if settings.width and width > settings.width then
-			position.y = position.y - highest_word
+		-- does the word fit on the line or does it overflow?
+		local overflow = (settings.width and (line_width + word.metrics.width) > settings.width)
+		if overflow then
+			-- overflow, position the words that fit on the line
 			position.x = settings.position.x
+			position.y = settings.position.y - text_metrics.height
+			position_words(line_words, line_width, position, settings)
+
+			-- update text metrics
+			text_metrics.width = math.max(text_metrics.width, line_width)
+			text_metrics.height = text_metrics.height + highest_word
 			highest_word = word.metrics.height
-			text_metrics.width = math.max(text_metrics.width, current_width)
+			
+			-- add the word that didn't fit to the next line instead
+			line_width = word.metrics.total_width
+			line_words[#line_words + 1] = word
 		else
+			-- the word fits on the line, add it and update text metrics
+			line_width = line_width + word.metrics.total_width
+			line_words[#line_words + 1] = word
+			text_metrics.width = math.max(text_metrics.width, line_width)
 			highest_word = math.max(highest_word, word.metrics.height)
-			text_metrics.width = math.max(text_metrics.width, width)
 		end
 
-		-- position word
-		gui.set_position(node, position)
-
-		-- update text metrics height
-		text_metrics.height = (settings.position.y - (position.y - highest_word))
-		
-		-- handle linebreak or advance on same line
+		-- handle line break
 		if word.linebreak then
-			position.y = position.y - highest_word
+			-- position all words on the line up until the linebreak
 			position.x = settings.position.x
-			highest_word = font_sizes[font].height
-		else
-			position.x = position.x + word.metrics.total_width
-		end
+			position.y = settings.position.y - text_metrics.height
+			position_words(line_words, line_width, position, settings)
 
+			-- update text metrics
+			text_metrics.height = text_metrics.height + highest_word
+			highest_word = math.max(highest_word, word.metrics.height)
+			line_width = 0
+		end
+	end
+
+	-- position remaining words
+	if #line_words > 0 then
+		position.x = settings.position.x
+		position.y = settings.position.y - text_metrics.height
+		position_words(line_words, line_width, position, settings)
+		text_metrics.height = text_metrics.height + highest_word
 	end
 
 	return words, text_metrics

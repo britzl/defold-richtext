@@ -80,7 +80,16 @@ The following named colors are supported:
 | yellow    | `#ffff00ff` | ![](https://placehold.it/15/ffff00/000000?text=+) |
 
 # Usage
-The RichText library will create gui text nodes representing the markup in the text passed to the library. It will search for tags and split the entire text into words, where each word contains additional meta-data that is used to create and configure text nodes. This means that the library will create as many text nodes as there are words in the text. Example:
+The RichText library will create gui text nodes representing the markup in the text passed to the library. It will search for tags and split the entire text into words, where each word contains additional meta-data that is used to create and configure text nodes. This means that the library will create as many text nodes as there are words in the text.
+
+## Basic usage
+A simple example with some color and linebreaks:
+
+	richtext.create("Single line text with a dash of <color=red>color</color>\nBy default left aligned.", "Roboto-Regular")
+
+![](docs/basic.png)
+
+A more complex example with different fonts, colors, inline images and automatic linebreaks:
 
 	local settings = {
 		fonts = {
@@ -95,7 +104,6 @@ The RichText library will create gui text nodes representing the markup in the t
 			},
 		},
 		width = 400,
-		position = vmath.vector3(0, 0, 0),
 		parent = gui.get_node("bg"),
 		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
 	}
@@ -104,27 +112,27 @@ The RichText library will create gui text nodes representing the markup in the t
 
 	richtext.create(text, "Roboto", settings)
 
-This would result in the following output:
-
 ![](docs/example.png)
 
 
+
 # API
-### richtext.create(text, settings)
+### richtext.create(text, font, settings)
 Creates rich text gui nodes from a text containing markup.
 
 **PARAMETERS**
 * `text` (string) - The text to create rich text from
-* `font` (string) - Name of default font. Must match the name of a font in the gui scene.
+* `font` (string) - Name of default font. Must match the name of a font in the gui scene or a key in the `fonts` table in `settings` (see below).
 * `settings` (table) - Optional table containing settings
 
 The `settings` table can contain the following values:
 
 * `width` (number) - Maximum width of a line of text. Omit this value to present the entire text on a single line
-* `position` (vector3) - Top-left corner of the first letter of the text. Text will flow from left to right and top to bottom from this position
+* `position` (vector3) - Top-left corner of the first letter of the text. Text will flow from left to right and top to bottom from this position. Defaults to 0,0 if not specified.
 * `parent` (node) - GUI nodes will be attached to this node if specified.
-* `fonts` (table) - Table with fonts, keyed on font name. Each entry should be a table with mappings to fonts for different font styles. Accepted keys are `regular`, `italic`, `bold`, `bold_italic`.
+* `fonts` (table) - Table with fonts, keyed on font name. Each entry should be a table with mappings to fonts for different font styles. Accepted keys are `regular`, `italic`, `bold`, `bold_italic`. If no `fonts` table is provided the font used will be the one passed to `richtext.create()`.
 * `color` (vector4) - The default color of text. Will be white if not specified.
+* `align` (hash) - One of `richtext_ALIGN_LEFT`, `richtext_ALIGN_CENTER` and `richtext_ALIGN_RIGHT`. Defaults to `richtext.ALIGN_LEFT`. Defines how the words of a line of text are positioned in relation the provided `position`.
 
 **RETURNS**
 * `words` (table) - A table with all the words that the text has been broken up into. Each word is represented by a table with keys such as `node`, `tags`, `text` etc
@@ -139,6 +147,16 @@ Get all words with a specific tag.
 
 **RETURNS**
 * `words` (table) - A table with all the words that matches the tag.
+
+
+### richtext.ALIGN_LEFT
+Left-align text. The words of a line starts at the specified position (see `richtext.create` settings above).
+
+### richtext.ALIGN_CENTER
+Center text. The words of a line are centered on the specified position (see `richtext.create` settings above).
+
+### richtext.ALIGN_RIGHT
+Right-align text. The words of a line ends at the specified position (see `richtext.create` settings above).
 
 
 # Credits

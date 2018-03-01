@@ -1,8 +1,8 @@
 local richtext = require "richtext.richtext"
 
-local TEXT = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit.<br/><b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry></img>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
 
-function init(self)
+
+local function create_complex_example()
 	local settings = {
 		fonts = {
 			Roboto = {
@@ -19,10 +19,11 @@ function init(self)
 		position = vmath.vector3(0, 0, 0),
 		parent = gui.get_node("bg"),
 		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
+		align = richtext.ALIGN_LEFT
 	}
+	local text = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit.<br/><b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry></img>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
 
-	print(TEXT)
-	local words, metrics = richtext.create(TEXT, "Roboto", settings)
+	local words, metrics = richtext.create(text, "Roboto", settings)
 
 	-- adjust background to cover text
 	gui.set_size(settings.parent, vmath.vector3(metrics.width, metrics.height, 0))
@@ -33,4 +34,20 @@ function init(self)
 		local pos = gui.get_position(bold_word.node)
 		gui.animate(bold_word.node, gui.PROP_POSITION, pos + vmath.vector3(0, 4, 0), gui.EASING_INOUTQUAD, 4, ((pos.x * pos.y) % 10) / 10, nil, gui.PLAYBACK_LOOP_PINGPONG)
 	end
+end
+
+
+local function create_align_example()
+	local settings_align_right = { position = vmath.vector3(640, 200, 0), align = richtext.ALIGN_RIGHT }
+	richtext.create("Right align this text\nDo it for both lines", "Roboto-Regular", settings_align_right)
+
+	local settings_align_center = { position = vmath.vector3(320, 90, 0), align = richtext.ALIGN_CENTER }
+	richtext.create("Center these words around the specified position\nAnd these words as well", "Roboto-Regular", settings_align_center)
+end
+
+function init(self)
+	--create_complex_example()
+	--create_align_example()
+
+	richtext.create("Single line text with a dash of <color=red>color</color>\nBy default left aligned.", "Roboto-Regular", { position = vmath.vector3(100, 100, 0) })
 end
