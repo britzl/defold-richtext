@@ -125,7 +125,7 @@ function M.parse(text, word_settings)
 	assert(text)
 	assert(word_settings)
 	local all_words = {}
-	while true do
+	while #text > 0 do
 		local before, tag, params, text_in_tag, after = find_tag(text)
 		-- no more tags? Split and add the entire string
 		if not tag then
