@@ -10,8 +10,28 @@ M.ALIGN_RIGHT = hash("ALIGN_RIGHT")
 local V3_ZERO = vmath.vector3(0)
 local V3_ONE = vmath.vector3(1)
 
+function deepcopy(orig)
+	local orig_type = type(orig)
+	local copy
+	if orig_type == 'table' then
+		copy = {}
+		for orig_key, orig_value in next, orig, nil do
+			copy[deepcopy(orig_key)] = deepcopy(orig_value)
+		end
+	else -- number, string, boolean, etc
+		copy = orig
+	end
+	return copy
+end
+
+
 local function get_trailing_whitespace(text)
 	return text:match("^.-(%s*)$") or ""
+end
+
+
+local function get_space_width(font)
+	return gui.get_text_metrics(font, " _").width - gui.get_text_metrics(font, "_").width
 end
 
 
@@ -76,6 +96,58 @@ function M.length(text)
 end
 
 
+local function create_box_node(word)
+	local node = gui.new_box_node(V3_ZERO, V3_ZERO)
+	gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
+	gui.set_texture(node, word.image.texture)
+	gui.play_flipbook(node, hash(word.image.anim))
+
+	-- get metrics of node based on image size
+	local image_size = gui.get_size(node)
+	local metrics = {}
+	metrics.total_width = image_size.x
+	metrics.width = image_size.x
+	metrics.height = image_size.y
+	return node, metrics
+end
+
+
+local function create_text_node(word, font, font_cache)
+	local node = gui.new_text_node(V3_ZERO, word.text)
+	gui.set_font(node, font)
+	gui.set_color(node, word.color)
+	gui.set_scale(node, V3_ONE * (word.size or 1))
+
+	-- get metrics of node with and without trailing whitespace
+	local metrics = gui.get_text_metrics(font, word.text)
+	metrics.width = metrics.width * word.size
+	metrics.height = metrics.height * word.size
+
+	-- get width of text with trailing whitespace included
+	local trailing_whitespace = get_trailing_whitespace(word.text)
+	if #trailing_whitespace > 0 then
+		metrics.total_width = (metrics.width + #trailing_whitespace * get_space_width(font)) * word.size
+	else
+		metrics.total_width = metrics.width
+	end
+	return node, metrics
+end
+
+
+local function create_node(word, parent, font)
+	local node, metrics
+	if word.image then
+		node, metrics = create_box_node(word)
+	else
+		node, metrics = create_text_node(word, font)
+	end
+	gui.set_pivot(node, gui.PIVOT_NW)
+	gui.set_parent(node, parent)
+	return node, metrics
+end
+
+
+
 --- Create rich text gui nodes from text
 -- @param text The text to create rich text nodes from
 -- @param font The default font
@@ -91,9 +163,6 @@ function M.create(text, font, settings)
 	settings.fonts[font] = settings.fonts[font] or { regular = hash(font) }
 	settings.color = settings.color or V3_ONE
 	settings.position = settings.position or V3_ZERO
-
-	-- cache length fonr metrics such as space width and height
-	local font_sizes = {}
 
 	-- default settings for a word
 	-- will be assigned to each word unless tags override the values
@@ -118,47 +187,9 @@ function M.create(text, font, settings)
 
 		-- get font to use based on word tags
 		local font = get_font(word, settings.fonts)
-		-- cache some font measurements for the current font
-		if not font_sizes[font] then
-			font_sizes[font] = {
-				space = gui.get_text_metrics(font, " _").width - gui.get_text_metrics(font, "_").width,
-				height = gui.get_text_metrics(font, "Ij").height,
-			}
-		end
 		
-		-- create and configure node
-		local node
-		if word.image then
-			node = gui.new_box_node(V3_ZERO, V3_ZERO)
-			gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
-			gui.set_texture(node, word.image.texture)
-			gui.play_flipbook(node, hash(word.image.anim))
-
-			-- get metrics of node based on image size
-			local image_size = gui.get_size(node)
-			word.metrics = {}
-			word.metrics.total_width = image_size.x
-			word.metrics.width = image_size.x
-			word.metrics.height = image_size.y
-		else
-			node = gui.new_text_node(V3_ZERO, word.text)
-			gui.set_font(node, font)
-			gui.set_color(node, word.color)
-			gui.set_scale(node, V3_ONE * (word.size or 1))
-
-			-- get metrics of node with and without trailing whitespace
-			word.metrics = gui.get_text_metrics_from_node(node)
-			word.metrics.total_width = (word.metrics.width + #get_trailing_whitespace(word.text) * font_sizes[font].space) * word.size
-			word.metrics.width = word.metrics.width * word.size
-			word.metrics.height = word.metrics.height * word.size
-		end
-
-		-- store node on word and set it's parent and pivot
-		word.node = node
-		if settings.parent then
-			gui.set_parent(node, settings.parent)
-		end
-		gui.set_pivot(node, gui.PIVOT_NW)
+		-- create node and get metrics
+		word.node, word.metrics = create_node(word, settings.parent, font)
 
 		-- does the word fit on the line or does it overflow?
 		local overflow = (settings.width and (line_width + word.metrics.width) > settings.width)
@@ -253,6 +284,48 @@ function M.truncate(words, length)
 		end		
 		count = count + word_length
 	end
+end
+
+
+--- Split a word into it's characters
+-- @param word The word to split
+-- @return The individual characters
+function M.characters(word)
+	assert(word)
+
+	-- exit early if word is a single character or empty
+	if #word.text <= 1 then
+		local char = deepcopy(word)
+		char.node, char.metrics = create_node(char, parent, font)
+		ui.set_position(char.node, gui.get_position(word.node))
+		return { char }
+	end
+	
+	-- split word into characters
+	local parent = gui.get_parent(word.node)
+	local font = gui.get_font(word.node)
+	local chars = {}
+	local chars_width = 0
+	for i=1,#word.text do
+		local char = deepcopy(word)
+		chars[#chars + 1] = char
+		char.text = word.text:sub(i,i)
+		char.node, char.metrics = create_node(char, parent, font)
+		chars_width = chars_width + char.metrics.width
+	end
+
+	-- position each character
+	-- take into account that the sum of the width of the individual
+	-- characters differ from the width of the entire word
+	local position = gui.get_position(word.node)
+	local spacing = (word.metrics.width - chars_width) / (#chars - 1)
+	for i=1,#chars do
+		local char = chars[i]
+		gui.set_position(char.node, position)
+		position.x = position.x + char.metrics.width + spacing
+	end
+
+	return chars
 end
 
 

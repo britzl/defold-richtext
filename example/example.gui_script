@@ -51,7 +51,6 @@ end
 local function create_truncate_example()
 	local settings = { position = vmath.vector3(0, 260, 0) }
 	local words, metrics = richtext.create("This text should be shown one <img=smileys:cyclops/> at a time...", "Roboto-Regular", settings)
-	pprint(metrics)
 	local length = 0
 	richtext.truncate(words, length)
 	timer.repeating(0.1, function()
@@ -61,8 +60,27 @@ local function create_truncate_example()
 end
 
 
+
+local function create_characters_example()
+	local settings = { position = vmath.vector3(0, 330, 0) }
+	local words, metrics = richtext.create("Our <wave><color=#ff69b4>princess</color></wave> is in another <wave><color=red>castle</color></wave>", "Roboto-Regular", settings)
+	
+	local waves = richtext.tagged(words, "wave")
+	for _,wave in pairs(waves) do
+		local chars = richtext.characters(wave)
+		gui.delete_node(wave.node)
+		for i,char in ipairs(chars) do
+			local pos = gui.get_position(char.node)
+			gui.animate(char.node, gui.PROP_POSITION, pos + vmath.vector3(0, 15, 0), gui.EASING_INOUTSINE, 2, i * 0.3, nil, gui.PLAYBACK_LOOP_PINGPONG)
+		end
+	end
+end
+
+
+
 function init(self)
 	create_complex_example()
 	create_align_example()
 	create_truncate_example()
+	create_characters_example()
 end

@@ -27,6 +27,7 @@ local function parse_tag(tag, params)
 	return settings
 end
 
+
 -- add a single word to the list of words
 local function add_word(text, settings, words)
 	local data = { text = text }
@@ -35,6 +36,7 @@ local function add_word(text, settings, words)
 	end
 	words[#words + 1] = data
 end
+
 
 -- split a line into words
 local function split_line(line, settings, words)
@@ -55,6 +57,7 @@ local function split_line(line, settings, words)
 		last.text = last.text:sub(1,#last.text - 1) .. ws_end
 	end
 end
+
 
 -- split text
 -- split by lines first
@@ -91,6 +94,7 @@ local function split_text(text, settings, words)
 	end
 end
 
+
 -- find tag in text
 -- return the tag, tag params and any text before and after the tag
 local function find_tag(text)
@@ -121,6 +125,11 @@ local function find_tag(text)
 	end
 end
 
+
+--- Parse the text into individual words
+-- @param text The text to parse
+-- @param word_settings Default settings for each word
+-- @return List of all words
 function M.parse(text, word_settings)
 	assert(text)
 	assert(word_settings)
@@ -161,6 +170,7 @@ end
 
 --- Get the length of a text, excluding any tags (except image tags)
 function M.length(text)
+	-- treat image tags as a single character
 	return #text:gsub("<img.-/>", " "):gsub("<.->", "")
 end
 

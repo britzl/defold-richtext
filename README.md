@@ -42,8 +42,9 @@ The following tags are supported:
 | i     | The text should be italic                      | `<i>Foobar</i>`                       |
 | size  | Change text size, relative to default size     | `<size="2">Twice as large</size>`     |
 | color | Change text color                              | `<color=red>Foobar</color>`           |
-|       |                                                | `<color=1.0,0.5,0,1.0>Foobar</color>` |
-|       |                                                | `<color=#ff00ffff>Foobar</color>`     |
+|       |                                                | `<color=1.0,0,0,1.0>Foobar</color>` |
+|       |                                                | `<color=#ff0000>Foobar</color>`       |
+|       |                                                | `<color=#ff0000ff>Foobar</color>`     |
 | font  | Change font                                    | `<font=MyCoolFont>Foobar</font>`      |
 | img   | Display image                                  | `<img=texture:image/>`                |
 | br    | Insert a line break (see notes on linebreak)   | `<br/>`                               |
@@ -78,6 +79,7 @@ The following named colors are supported:
 | teal      | `#008080ff` | ![](https://placehold.it/15/008080/000000?text=+) |
 | white     | `#ffffffff` | ![](https://placehold.it/15/ffffff/000000?text=+) |
 | yellow    | `#ffff00ff` | ![](https://placehold.it/15/ffff00/000000?text=+) |
+
 
 # Usage
 The RichText library will create gui text nodes representing the markup in the text passed to the library. It will search for tags and split the entire text into words, where each word contains additional meta-data that is used to create and configure text nodes. This means that the library will create as many text nodes as there are words in the text.
@@ -114,7 +116,6 @@ A more complex example with different fonts, colors, inline images and automatic
 	richtext.create(text, "Roboto", settings)
 
 ![](docs/example.png)
-
 
 
 # API
@@ -172,6 +173,16 @@ Get the length of a text ignoring any tags except image tags which are treated a
 
 **RETURNS**
 * `length` (number) - The length of the provided text.
+
+
+### richtext.characters(word)
+Split a word into it's characters, including the creation of the gui nodes. Each of the characters will be given the same attributes as the word, and they will be positioned correctly within the word.
+
+**PARAMETERS**
+* `word` (table) - The word to split, as received from a call to `richtext.create()` or `richtext.tagged()`.
+
+**RETURNS**
+* `characters` (table) - The individual characters of the word.
 
 
 ### richtext.ALIGN_LEFT
