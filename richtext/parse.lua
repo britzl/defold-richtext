@@ -134,7 +134,7 @@ function M.parse(text, word_settings)
 	assert(text)
 	assert(word_settings)
 	local all_words = {}
-	while #text > 0 do
+	repeat
 		local before, tag, params, text_in_tag, after = find_tag(text)
 		-- no more tags? Split and add the entire string
 		if not tag then
@@ -161,9 +161,9 @@ function M.parse(text, word_settings)
 		for _,word in ipairs(inner_words) do
 			all_words[#all_words + 1] = word
 		end
-		
+
 		text = after
-	end
+	until text == ""
 	return all_words
 end
 
