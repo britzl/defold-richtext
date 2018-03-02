@@ -72,6 +72,9 @@ local function split_text(text, settings, words)
 		return
 	end
 
+	-- we don't want to deal with \r\n, remove all \r
+	text = text:gsub("\r", "")
+
 	-- the Lua pattern expects the text to have a linebreak at the end
 	local added_linebreak = false
 	if text:sub(-1)~="\n" then
