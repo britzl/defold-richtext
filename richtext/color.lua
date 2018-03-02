@@ -1,7 +1,8 @@
 local M = {}
 
 function M.parse_hex(hex)
-	local r,g,b,a = hex:match("#(%x%x)(%x%x)(%x%x)(%x%x)")
+	local r,g,b,a = hex:match("#(%x%x)(%x%x)(%x%x)(%x?%x?)")
+	if a == "" then a = "ff" end
 	if r and g and b and a then
 		return vmath.vector4(tonumber(r, 16) / 255, tonumber(g, 16) / 255, tonumber(b, 16) / 255, tonumber(a, 16) / 255)
 	end
