@@ -4,10 +4,6 @@ fonts {
   font: "/example/assets/fonts/VeraMo.font"
 }
 fonts {
-  name: "alagard"
-  font: "/example/assets/fonts/alagard.font"
-}
-fonts {
   name: "Nanum-Regular"
   font: "/example/assets/fonts/Nanum-Regular.font"
 }
