@@ -70,7 +70,15 @@ local function create_characters_example()
 		gui.delete_node(wave.node)
 		for i,char in ipairs(chars) do
 			local pos = gui.get_position(char.node)
-			gui.animate(char.node, gui.PROP_POSITION, pos + vmath.vector3(0, 15, 0), gui.EASING_INOUTSINE, 2, i * 0.3, nil, gui.PLAYBACK_LOOP_PINGPONG)
+			local pos_2 = gui.get_position(char.node)
+			pos_2.y = pos_2.y - 3
+			pos_2.x = pos_2.x + 2
+			gui.set_position(char.node, pos_2)
+			gui.animate(char.node, gui.PROP_POSITION, pos + vmath.vector3(0, 3, 0), gui.EASING_INOUTSINE, 0.6, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
+			gui.animate(char.node, "color.x", 0.9, gui.EASING_INOUTSINE, 0.2, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
+			gui.animate(char.node, "color.y", 0.9, gui.EASING_INOUTSINE, 0.6, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
+			gui.animate(char.node, "color.z", 0.9, gui.EASING_INOUTSINE, 10, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
+			gui.animate(char.node, "scale", 1.2, gui.EASING_INOUTSINE, 1.5, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
 		end
 	end
 end
