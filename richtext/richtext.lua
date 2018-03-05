@@ -126,7 +126,7 @@ local function create_text_node(word, font, font_cache)
 	-- get width of text with trailing whitespace included
 	local trailing_whitespace = get_trailing_whitespace(word.text)
 	if #trailing_whitespace > 0 then
-		metrics.total_width = (metrics.width + #trailing_whitespace * get_space_width(font)) * word.size
+		metrics.total_width = metrics.width + (#trailing_whitespace * get_space_width(font) * word.size)
 	else
 		metrics.total_width = metrics.width
 	end
