@@ -224,7 +224,7 @@ function M.create(text, font, settings)
 
 			-- update text metrics
 			text_metrics.height = text_metrics.height + highest_word
-			highest_word = math.max(highest_word, word.metrics.height)
+			highest_word = word.metrics.height
 			line_width = 0
 		end
 	end
