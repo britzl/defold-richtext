@@ -163,6 +163,7 @@ function M.create(text, font, settings)
 	settings.fonts[font] = settings.fonts[font] or { regular = hash(font) }
 	settings.color = settings.color or V3_ONE
 	settings.position = settings.position or V3_ZERO
+	settings.line_spacing = settings.line_spacing or 1
 
 	-- default settings for a word
 	-- will be assigned to each word unless tags override the values
@@ -201,7 +202,7 @@ function M.create(text, font, settings)
 
 			-- update text metrics
 			text_metrics.width = math.max(text_metrics.width, line_width)
-			text_metrics.height = text_metrics.height + highest_word
+			text_metrics.height = text_metrics.height + (highest_word * settings.line_spacing)
 			highest_word = word.metrics.height
 			
 			-- add the word that didn't fit to the next line instead
@@ -223,7 +224,7 @@ function M.create(text, font, settings)
 			position_words(line_words, line_width, position, settings)
 
 			-- update text metrics
-			text_metrics.height = text_metrics.height + highest_word
+			text_metrics.height = text_metrics.height + (highest_word * settings.line_spacing)
 			highest_word = word.metrics.height
 			line_width = 0
 		end

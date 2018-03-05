@@ -135,6 +135,7 @@ The `settings` table can contain the following values:
 * `fonts` (table) - Table with fonts, keyed on font name. Each entry should be a table with mappings to fonts for different font styles. Accepted keys are `regular`, `italic`, `bold`, `bold_italic`. If no `fonts` table is provided the font used will be the one passed to `richtext.create()`.
 * `color` (vector4) - The default color of text. Will be white if not specified.
 * `align` (hash) - One of `richtext.ALIGN_LEFT`, `richtext.ALIGN_CENTER` and `richtext.ALIGN_RIGHT`. Defaults to `richtext.ALIGN_LEFT`. Defines how the words of a line of text are positioned in relation the provided `position`.
+* `line_spacing` (number) - Value to multiply line height with. Set to a value lower than 1.0 to reduce space between lines and a value higher than 1.0 to increase space between lines. Defaults to 1.0.
 
 **RETURNS**
 * `words` (table) - A table with all the words that the text has been broken up into. Each word is represented by a table with keys such as `node`, `tags`, `text` etc
@@ -145,6 +146,7 @@ The `metrics` table contains the following values:
 * `width` (number) - Width of the text
 * `height` (number) - Height of the text
 * `char_count` (number) - Number of characters in the text including whitespace and images
+
 
 ### richtext.tagged(words, tag)
 Get all words with a specific tag.
