@@ -42,11 +42,12 @@ The following tags are supported:
 | i     | The text should be italic                      | `<i>Foobar</i>`                       |
 | size  | Change text size, relative to default size     | `<size="2">Twice as large</size>`     |
 | color | Change text color                              | `<color=red>Foobar</color>`           |
-|       |                                                | `<color=1.0,0,0,1.0>Foobar</color>` |
+|       |                                                | `<color=1.0,0,0,1.0>Foobar</color>`   |
 |       |                                                | `<color=#ff0000>Foobar</color>`       |
 |       |                                                | `<color=#ff0000ff>Foobar</color>`     |
 | font  | Change font                                    | `<font=MyCoolFont>Foobar</font>`      |
 | img   | Display image                                  | `<img=texture:image/>`                |
+| spine | Display spine model                            | `<spine=scene:anim/>`                 |
 | br    | Insert a line break (see notes on linebreak)   | `<br/>`                               |
 
 ### Line breaks
@@ -168,7 +169,7 @@ Truncate a text such that only a specific number of characters and images are vi
 
 
 ### richtext.length(text)
-Get the length of a text ignoring any tags except image tags which are treated as having a length of 1.
+Get the length of a text ignoring any tags except image and spine tags which are treated as having a length of 1.
 
 **PARAMETERS**
 * `text` (string|table) - The text to measure. This can either be a string or a list of words, as received by a call to `richtext.create()`.

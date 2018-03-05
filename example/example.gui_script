@@ -37,7 +37,7 @@ local function create_align_example()
 	richtext.create("Right align this text\nDo it for both lines", "Roboto-Regular", settings_align_right)
 
 	local settings_align_center = { position = vmath.vector3(320, 90, 0), align = richtext.ALIGN_CENTER }
-	richtext.create("Center these words around the specified position\nAnd these words as well", "Roboto-Regular", settings_align_center)
+	richtext.create("Center words around the specified position\nAnd these words as well", "Roboto-Regular", settings_align_center)
 end
 
 
@@ -51,7 +51,6 @@ local function create_truncate_example()
 		richtext.truncate(words, length)
 	end)
 end
-
 
 
 local function create_characters_example()
@@ -78,10 +77,17 @@ local function create_characters_example()
 end
 
 
+local function create_spine_example()
+	local settings = { position = vmath.vector3(320, 400, 0), align = richtext.ALIGN_CENTER }
+	richtext.create("A running   <size=0.05><spine=spineboy:run/></size>  in my text", "Roboto-Regular", settings)
+end
+
+
 
 function init(self)
 	create_complex_example()
 	create_align_example()
 	create_truncate_example()
 	create_characters_example()
+	create_spine_example()
 end

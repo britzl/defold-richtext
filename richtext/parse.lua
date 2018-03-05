@@ -22,6 +22,12 @@ local function parse_tag(tag, params)
 			texture = texture,
 			anim = anim
 		}
+	elseif tag == "spine" then
+		local scene, anim = params:match("(.-):(.*)")
+		settings.spine = {
+			scene = scene,
+			anim = anim
+		}
 	end
 
 	return settings
@@ -171,10 +177,10 @@ function M.parse(text, word_settings)
 end
 
 
---- Get the length of a text, excluding any tags (except image tags)
+--- Get the length of a text, excluding any tags (except image and spine tags)
 function M.length(text)
-	-- treat image tags as a single character
-	return #text:gsub("<img.-/>", " "):gsub("<.->", "")
+	-- treat image and spine tags as a single character
+	return #text:gsub("<img.-/>", " "):gsub("<spine.-/>", " "):gsub("<.->", "")
 end
 
 

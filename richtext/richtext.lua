@@ -61,7 +61,7 @@ end
 
 -- position all words according to the line alignment and line width
 -- the list of words will be empty after this function is called
-local function position_words(words, line_width, position, settings)
+local function position_words(words, line_width, line_height, position, settings)
 	if settings.align == M.ALIGN_RIGHT then
 		position.x = position.x - line_width
 	elseif settings.align == M.ALIGN_CENTER then
@@ -70,7 +70,15 @@ local function position_words(words, line_width, position, settings)
 
 	for i=1,#words do
 		local word = words[i]
-		gui.set_position(word.node, position)
+		-- align spine animations to bottom of line since
+		-- spine animations ignore pivot (always PIVOT_S)
+		if word.spine then
+			position.y = position.y - line_height
+			gui.set_position(word.node, position)
+			position.y = position.y + line_height
+		else
+			gui.set_position(word.node, position)
+		end
 		position.x = position.x + word.metrics.total_width
 		words[i] = nil
 	end
@@ -89,7 +97,8 @@ function M.length(text)
 		local count = 0
 		for i=1,#text do
 			local word = text[i]
-			count = count + (word.image and 1 or #word.text)
+			local is_text_node = not word.image and not word.spine
+			count = count + (is_text_node and #word.text or 1)
 		end
 		return count
 	end
@@ -103,11 +112,27 @@ local function create_box_node(word)
 	gui.play_flipbook(node, hash(word.image.anim))
 
 	-- get metrics of node based on image size
-	local image_size = gui.get_size(node)
+	local size = gui.get_size(node)
 	local metrics = {}
-	metrics.total_width = image_size.x
-	metrics.width = image_size.x
-	metrics.height = image_size.y
+	metrics.total_width = size.x
+	metrics.width = size.x
+	metrics.height = size.y
+	return node, metrics
+end
+
+
+local function create_spine_node(word)
+	local node = gui.new_spine_node(V3_ZERO, word.spine.scene)
+	gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
+	gui.set_scale(node, vmath.vector3(word.size))
+	gui.play_spine_anim(node, word.spine.anim, gui.PLAYBACK_LOOP_FORWARD)
+
+	local size = gui.get_size(node)
+	local metrics = {}
+	metrics.total_width = size.x
+	metrics.width = size.x
+	metrics.height = size.y
+	pprint(metrics)
 	return node, metrics
 end
 
@@ -138,6 +163,8 @@ local function create_node(word, parent, font)
 	local node, metrics
 	if word.image then
 		node, metrics = create_box_node(word)
+	elseif word.spine then
+		node, metrics = create_spine_node(word)
 	else
 		node, metrics = create_text_node(word, font)
 	end
@@ -173,7 +200,6 @@ function M.create(text, font, settings)
 		size = 1
 	}
 	local words = parser.parse(text, word_settings)
-	local highest_word = 0
 	local text_metrics = {
 		width = 0,
 		height = 0,
@@ -181,6 +207,7 @@ function M.create(text, font, settings)
 	}
 	local line_words = {}
 	local line_width = 0
+	local line_height = 0
 	local position = vmath.vector3(settings.position)
 	for i=1,#words do
 		local word = words[i]
@@ -198,22 +225,22 @@ function M.create(text, font, settings)
 			-- overflow, position the words that fit on the line
 			position.x = settings.position.x
 			position.y = settings.position.y - text_metrics.height
-			position_words(line_words, line_width, position, settings)
+			position_words(line_words, line_width, line_height, position, settings)
+
+			-- add the word that didn't fit to the next line instead
+			line_words[#line_words + 1] = word
 
 			-- update text metrics
 			text_metrics.width = math.max(text_metrics.width, line_width)
-			text_metrics.height = text_metrics.height + (highest_word * settings.line_spacing)
-			highest_word = word.metrics.height
-			
-			-- add the word that didn't fit to the next line instead
+			text_metrics.height = text_metrics.height + (line_height * settings.line_spacing)
 			line_width = word.metrics.total_width
-			line_words[#line_words + 1] = word
+			line_height = word.metrics.height
 		else
 			-- the word fits on the line, add it and update text metrics
 			line_width = line_width + word.metrics.total_width
+			line_height = math.max(line_height, word.metrics.height)
 			line_words[#line_words + 1] = word
 			text_metrics.width = math.max(text_metrics.width, line_width)
-			highest_word = math.max(highest_word, word.metrics.height)
 		end
 
 		-- handle line break
@@ -221,11 +248,11 @@ function M.create(text, font, settings)
 			-- position all words on the line up until the linebreak
 			position.x = settings.position.x
 			position.y = settings.position.y - text_metrics.height
-			position_words(line_words, line_width, position, settings)
+			position_words(line_words, line_width, line_height, position, settings)
 
 			-- update text metrics
-			text_metrics.height = text_metrics.height + (highest_word * settings.line_spacing)
-			highest_word = word.metrics.height
+			text_metrics.height = text_metrics.height + (line_height * settings.line_spacing)
+			line_height = word.metrics.height
 			line_width = 0
 		end
 	end
@@ -234,8 +261,8 @@ function M.create(text, font, settings)
 	if #line_words > 0 then
 		position.x = settings.position.x
 		position.y = settings.position.y - text_metrics.height
-		position_words(line_words, line_width, position, settings)
-		text_metrics.height = text_metrics.height + highest_word
+		position_words(line_words, line_width, line_height, position, settings)
+		text_metrics.height = text_metrics.height + line_height
 	end
 
 	return words, text_metrics
@@ -270,9 +297,10 @@ function M.truncate(words, length)
 	local count = 0
 	for i=1,#words do
 		local word = words[i]
-		local word_length = word.image and 1 or #word.text
+		local is_text_node = not word.image and not word.spine
+		local word_length = is_text_node and #word.text or 1
 		gui.set_enabled(word.node, count < length)
-		if count < length and not word.image then
+		if count < length and is_text_node then
 			-- should entire or part of word be visible?
 			if count + word_length <= length then
 				-- entire word
