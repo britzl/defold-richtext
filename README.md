@@ -133,10 +133,45 @@ The `settings` table can contain the following values:
 * `width` (number) - Maximum width of a line of text. Omit this value to present the entire text on a single line
 * `position` (vector3) - The position that the text aligns to (refer to the `align` setting for details). Defaults to 0,0 if not specified.
 * `parent` (node) - GUI nodes will be attached to this node if specified.
-* `fonts` (table) - Table with fonts, keyed on font name. Each entry should be a table with mappings to fonts for different font styles. Accepted keys are `regular`, `italic`, `bold`, `bold_italic`. If no `fonts` table is provided the font used will be the one passed to `richtext.create()`.
+* `fonts` (table) - Table with fonts, keyed on font name. See separate section below. If no `fonts` table is provided the font used will be the one passed to `richtext.create()`.
+* `layers` (table) - Table with font, texture and spine scene mappings to layer names. See separate section below.
 * `color` (vector4) - The default color of text. Will be white if not specified.
 * `align` (hash) - One of `richtext.ALIGN_LEFT`, `richtext.ALIGN_CENTER` and `richtext.ALIGN_RIGHT`. Defaults to `richtext.ALIGN_LEFT`. Defines how the words of a line of text are positioned in relation the provided `position`.
 * `line_spacing` (number) - Value to multiply line height with. Set to a value lower than 1.0 to reduce space between lines and a value higher than 1.0 to increase space between lines. Defaults to 1.0.
+
+The `fonts` table should have the following format:
+
+	name (string) = {
+		regular (string) = font (hash),
+		italic (string) = font (hash),
+		bold (string) = font (hash),
+		bold_italic (string) = font (hash),
+	},
+	name (string) = {
+		...
+	},
+
+Where `name` is the name specified in a `<font>` tag and the `font` for each of `regular`, `italic`, `bold` and `bold_italic` should correspond to the name of a font added to a .gui scene.
+
+The `layers` table should map fonts, textures and spine scenes to layer names. It should have the following format:
+
+	fonts = {
+		font (hash) = layer (hash),
+		...
+		font (hash) = layer (hash),
+	},
+	images = {
+		texture (hash) = layer (hash),
+		...
+		texture (hash) = layer (hash),
+	},
+	spinescenes = {
+		spinescene (hash) = layer (hash),
+		...
+		spinescene (hash) = layer (hash),
+	}
+
+Where `layer` is the name of a layer in the .gui scene, `font` is the value returned from a call to `gui.get_font(node)`, `texture` is the value returned from a call to `gui.get_texture(node)` and finally `spinescene` is the value returned from a call to `gui.get_spine_scene(node)`.
 
 **RETURNS**
 * `words` (table) - A table with all the words that the text has been broken up into. Each word is represented by a table with keys such as `node`, `tags`, `text` etc

@@ -59,6 +59,17 @@ local function get_font(word, fonts)
 end
 
 
+local function get_layer(word, layers)
+	local node = word.node
+	if word.image then
+		return layers.images[gui.get_texture(node)]
+	elseif word.spine then
+		return layers.spinescenes[gui.get_spine_scene(node)]
+	end
+	return layers.fonts[gui.get_font(node)]
+end
+
+
 -- position all words according to the line alignment and line width
 -- the list of words will be empty after this function is called
 local function position_words(words, line_width, line_height, position, settings)
@@ -188,6 +199,10 @@ function M.create(text, font, settings)
 	settings.align = settings.align or M.ALIGN_LEFT
 	settings.fonts = settings.fonts or {}
 	settings.fonts[font] = settings.fonts[font] or { regular = hash(font) }
+	settings.layers = settings.layers or {}
+	settings.layers.fonts = settings.layers.fonts or {}
+	settings.layers.images = settings.layers.images or {}
+	settings.layers.spinescenes = settings.layers.spinescenes or {}
 	settings.color = settings.color or V3_ONE
 	settings.position = settings.position or V3_ZERO
 	settings.line_spacing = settings.line_spacing or 1
@@ -215,10 +230,16 @@ function M.create(text, font, settings)
 
 		-- get font to use based on word tags
 		local font = get_font(word, settings.fonts)
-		
+
 		-- create node and get metrics
 		word.node, word.metrics = create_node(word, settings.parent, font)
 
+		-- assign layer
+		local layer = get_layer(word, settings.layers)
+		if layer then
+			gui.set_layer(word.node, layer)
+		end
+		
 		-- does the word fit on the line or does it overflow?
 		local overflow = (settings.width and (line_width + word.metrics.width) > settings.width)
 		if overflow then
@@ -333,6 +354,7 @@ function M.characters(word)
 	-- split word into characters
 	local parent = gui.get_parent(word.node)
 	local font = gui.get_font(word.node)
+	local layer = gui.get_layer(word.node)
 	local chars = {}
 	local chars_width = 0
 	for i=1,#word.text do
@@ -340,6 +362,7 @@ function M.characters(word)
 		chars[#chars + 1] = char
 		char.text = word.text:sub(i,i)
 		char.node, char.metrics = create_node(char, parent, font)
+		gui.set_layer(char.node, layer)
 		chars_width = chars_width + char.metrics.width
 	end
 

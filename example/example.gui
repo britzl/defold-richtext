@@ -87,6 +87,27 @@ nodes {
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
 }
+layers {
+  name: "roboto-regular"
+}
+layers {
+  name: "roboto-bold"
+}
+layers {
+  name: "roboto-italic"
+}
+layers {
+  name: "roboto-bold_italic"
+}
+layers {
+  name: "nanum-regular"
+}
+layers {
+  name: "image-smileys"
+}
+layers {
+  name: "spine-spineboy"
+}
 material: "/builtins/materials/gui.material"
 adjust_reference: ADJUST_REFERENCE_PARENT
 max_nodes: 512

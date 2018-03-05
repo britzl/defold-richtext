@@ -15,6 +15,21 @@ local function create_complex_example()
 				regular = hash("Nanum-Regular"),
 			},
 		},
+		layers = {
+			fonts = {
+				[hash("Roboto-Regular")] = hash("roboto-regular"),
+				[hash("Roboto-Italic")] = hash("roboto-italic"),
+				[hash("Roboto-Bold")] = hash("roboto-bold"),
+				[hash("Roboto-BoldItalic")] = hash("roboto-bold_italic"),
+				[hash("Nanum-Regular")] = hash("nanum-regular"),
+			},
+			images = {
+				[hash("smileys")] = hash("image-smileys"),
+			},
+			spinemodels = {
+				[hash("spineboy")] = hash("spine-spineboy"),
+			},
+		},
 		width = 400,
 		position = vmath.vector3(0, 0, 0),
 		parent = gui.get_node("bg"),
