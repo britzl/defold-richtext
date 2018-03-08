@@ -132,14 +132,15 @@ local function create_box_node(word)
 	local node = gui.new_box_node(V3_ZERO, V3_ZERO)
 	gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
 	gui.set_texture(node, word.image.texture)
+	gui.set_scale(node, vmath.vector3(word.size))
 	gui.play_flipbook(node, hash(word.image.anim))
 
 	-- get metrics of node based on image size
 	local size = gui.get_size(node)
 	local metrics = {}
-	metrics.total_width = size.x
-	metrics.width = size.x
-	metrics.height = size.y
+	metrics.total_width = size.x * word.size
+	metrics.width = size.x * word.size
+	metrics.height = size.y * word.size
 	return node, metrics
 end
 
