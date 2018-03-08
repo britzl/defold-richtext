@@ -10,6 +10,16 @@ M.ALIGN_RIGHT = hash("ALIGN_RIGHT")
 local V3_ZERO = vmath.vector3(0)
 local V3_ONE = vmath.vector3(1)
 
+
+local function round(v)
+	if type(v) == "number" then
+		return math.floor(v + 0.5)
+	else
+		return vmath.vector3(math.floor(v.x + 0.5), math.floor(v.y + 0.5), math.floor(v.z + 0.5))
+	end
+end
+
+
 function deepcopy(orig)
 	local orig_type = type(orig)
 	local copy
@@ -87,6 +97,8 @@ local function position_words(words, line_width, line_height, position, settings
 			position.y = position.y - line_height
 			gui.set_position(word.node, position)
 			position.y = position.y + line_height
+		elseif word.image and settings.image_pixel_grid_snap then
+			gui.set_position(word.node, round(position))
 		else
 			gui.set_position(word.node, position)
 		end
@@ -206,6 +218,7 @@ function M.create(text, font, settings)
 	settings.color = settings.color or V3_ONE
 	settings.position = settings.position or V3_ZERO
 	settings.line_spacing = settings.line_spacing or 1
+	settings.image_pixel_grid_snap = settings.image_pixel_grid_snap or false
 
 	-- default settings for a word
 	-- will be assigned to each word unless tags override the values
