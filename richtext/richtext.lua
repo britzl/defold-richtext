@@ -165,7 +165,7 @@ local function create_text_node(word, font, font_cache)
 	local node = gui.new_text_node(V3_ZERO, word.text)
 	gui.set_font(node, font)
 	gui.set_color(node, word.color)
-	gui.set_scale(node, V3_ONE * (word.size or 1))
+	gui.set_scale(node, V3_ONE * word.size)
 
 	-- get metrics of node with and without trailing whitespace
 	local metrics = gui.get_text_metrics(font, word.text)
