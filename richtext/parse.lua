@@ -3,7 +3,7 @@ local color = require "richtext.color"
 local M = {}
 
 local function parse_tag(tag, params)
-	local settings = { tags = { [tag] = true } }
+	local settings = { tags = { [tag] = params } }
 	if tag == "color" then
 		settings.color = color.parse(params)
 	elseif tag == "font" then
@@ -161,8 +161,8 @@ function M.parse(text, word_settings)
 		for k,v in pairs(word_settings) do
 			tag_settings[k] = tag_settings[k] or v
 		end
-		for tag,_ in pairs(word_settings.tags or {}) do
-			tag_settings.tags[tag] = true
+		for tag,params in pairs(word_settings.tags or {}) do
+			tag_settings.tags[tag] = (params == "") and true or params
 		end
 
 		-- parse the text in the tag and add the words

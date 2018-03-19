@@ -70,7 +70,7 @@ end
 
 local function create_characters_example()
 	local settings = { position = vmath.vector3(0, 330, 0) }
-	local words, metrics = richtext.create("Our <wave><color=#ff69b4>princess</color></wave> is in another <wave><color=red>castle</color></wave>", "Roboto-Regular", settings)
+	local words, metrics = richtext.create("Our <wave><color=#ff69b4>princess</color></wave> is in another <wave=25><color=red>castle</color></wave>", "Roboto-Regular", settings)
 	
 	local waves = richtext.tagged(words, "wave")
 	for _,wave in pairs(waves) do
@@ -82,7 +82,8 @@ local function create_characters_example()
 			pos_2.y = pos_2.y - 3
 			pos_2.x = pos_2.x + 2
 			gui.set_position(char.node, pos_2)
-			gui.animate(char.node, gui.PROP_POSITION, pos + vmath.vector3(0, 3, 0), gui.EASING_INOUTSINE, 0.6, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
+			local amplitude = tonumber(wave.tags.wave) or 3
+			gui.animate(char.node, gui.PROP_POSITION, pos + vmath.vector3(0, amplitude, 0), gui.EASING_INOUTSINE, 0.6, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
 			gui.animate(char.node, "color.x", 0.9, gui.EASING_INOUTSINE, 0.2, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
 			gui.animate(char.node, "color.y", 0.9, gui.EASING_INOUTSINE, 0.6, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
 			gui.animate(char.node, "color.z", 0.9, gui.EASING_INOUTSINE, 10, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
