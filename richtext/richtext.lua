@@ -194,6 +194,7 @@ local function create_node(word, parent, font)
 	end
 	gui.set_pivot(node, gui.PIVOT_NW)
 	gui.set_parent(node, parent)
+	gui.set_inherit_alpha(node, true)
 	return node, metrics
 end
 
