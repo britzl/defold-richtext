@@ -57,13 +57,26 @@ end
 
 
 local function create_truncate_example()
+	-- add a "cursor" that should follow at the end of the text as it is revealed
+	local cursor = gui.new_box_node(vmath.vector3(), vmath.vector3(2,35,1))
+	gui.set_color(cursor, vmath.vector4(1))
+	gui.set_pivot(cursor, gui.PIVOT_NW)
+
 	local settings = { position = vmath.vector3(0, 260, 0) }
 	local words, metrics = richtext.create("This text should be shown one <img=smileys:cyclops/> at a time...", "Roboto-Regular", settings)
 	local length = 0
 	richtext.truncate(words, length)
 	timer.repeating(0.1, function()
 		length = (length + 1) % (metrics.char_count + 1)
-		richtext.truncate(words, length)
+		
+		local last_word = richtext.truncate(words, length)
+		local pos = vmath.vector3(settings.position)
+		if last_word then
+			pos = gui.get_position(last_word.node)
+			pos.x = pos.x + last_word.metrics.width + 5
+		end
+		gui.set_position(cursor, pos)
+		gui.set_enabled(cursor, not gui.is_enabled(cursor))
 	end)
 end
 

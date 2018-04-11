@@ -156,19 +156,16 @@ local function create_spine_node(word)
 	metrics.total_width = size.x
 	metrics.width = size.x
 	metrics.height = size.y
-	pprint(metrics)
 	return node, metrics
 end
 
 
-local function create_text_node(word, font, font_cache)
-	local node = gui.new_text_node(V3_ZERO, word.text)
-	gui.set_font(node, font)
-	gui.set_color(node, word.color)
-	gui.set_scale(node, V3_ONE * word.size)
+local function get_text_metrics(word, font, text)
+	text = text or word.text
+	font = font or word.font
 
 	-- get metrics of node with and without trailing whitespace
-	local metrics = gui.get_text_metrics(font, word.text)
+	local metrics = gui.get_text_metrics(font, text)
 	metrics.width = metrics.width * word.size
 	metrics.height = metrics.height * word.size
 
@@ -179,6 +176,18 @@ local function create_text_node(word, font, font_cache)
 	else
 		metrics.total_width = metrics.width
 	end
+	return metrics
+end
+
+
+local function create_text_node(word, font)
+	assert(font)
+	local node = gui.new_text_node(V3_ZERO, word.text)
+	gui.set_font(node, font)
+	gui.set_color(node, word.color)
+	gui.set_scale(node, V3_ONE * word.size)
+
+	local metrics = get_text_metrics(word, font)
 	return node, metrics
 end
 
@@ -331,24 +340,27 @@ function M.truncate(words, length)
 	assert(words)
 	assert(length)
 	local count = 0
+	local last_visible_word = nil
 	for i=1,#words do
 		local word = words[i]
 		local is_text_node = not word.image and not word.spine
 		local word_length = is_text_node and #word.text or 1
-		gui.set_enabled(word.node, count < length)
+		local visible = count < length
+		last_visible_word = visible and word or last_visible_word
+		gui.set_enabled(word.node, visible)
 		if count < length and is_text_node then
-			-- should entire or part of word be visible?
-			if count + word_length <= length then
-				-- entire word
-				gui.set_text(word.node, word.text)
-			else
-				-- partial word
+			local text = word.text
+			-- partial word?
+			if count + word_length > length then
 				local overflow = (count + word_length) - length
-				gui.set_text(word.node, word.text:sub(1, word_length - overflow))
+				text = word.text:sub(1, word_length - overflow)
 			end
-		end		
+			gui.set_text(word.node, text)
+			word.metrics = get_text_metrics(word, word.font, text)
+		end	
 		count = count + word_length
 	end
+	return last_visible_word
 end
 
 
