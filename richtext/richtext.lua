@@ -358,18 +358,20 @@ end
 function M.characters(word)
 	assert(word)
 
+	local parent = gui.get_parent(word.node)
+	local font = gui.get_font(word.node)
+	local layer = gui.get_layer(word.node)
+	
 	-- exit early if word is a single character or empty
 	if #word.text <= 1 then
 		local char = deepcopy(word)
 		char.node, char.metrics = create_node(char, parent, font)
-		ui.set_position(char.node, gui.get_position(word.node))
+		gui.set_position(char.node, gui.get_position(word.node))
+		gui.set_layer(char.node, layer)
 		return { char }
 	end
 	
 	-- split word into characters
-	local parent = gui.get_parent(word.node)
-	local font = gui.get_font(word.node)
-	local layer = gui.get_layer(word.node)
 	local chars = {}
 	local chars_width = 0
 	for i=1,#word.text do
