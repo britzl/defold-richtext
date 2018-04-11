@@ -28,6 +28,8 @@ local function parse_tag(tag, params)
 			scene = scene,
 			anim = anim
 		}
+	elseif tag == "nobr" then
+		settings.nobr = true
 	end
 
 	return settings

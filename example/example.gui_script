@@ -112,6 +112,15 @@ local function create_spine_example()
 end
 
 
+local function create_nobreak_example()
+	local settings_nobr = { position = vmath.vector3(0, 600, 0), align = richtext.ALIGN_LEFT, width = 245 }
+	richtext.create("The image at the end should end up on a new line <nobr><img=smileys:cyclops/></nobr>", "Roboto-Regular", settings_nobr)
+
+	local settings_right = { position = vmath.vector3(320, 600, 0), align = richtext.ALIGN_LEFT, width = 245 }
+	richtext.create("The image at the end should end up on a new line <img=smileys:cyclops/>", "Roboto-Regular", settings_right)
+end
+
+
 
 function init(self)
 	create_complex_example()
@@ -119,4 +128,5 @@ function init(self)
 	create_truncate_example()
 	create_characters_example()
 	create_spine_example()
+	create_nobreak_example()
 end

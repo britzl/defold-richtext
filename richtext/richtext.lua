@@ -266,7 +266,7 @@ function M.create(text, font, settings)
 		
 		-- does the word fit on the line or does it overflow?
 		local overflow = (settings.width and (line_width + word.metrics.width) > settings.width)
-		if overflow then
+		if overflow and not word.nobr then
 			-- overflow, position the words that fit on the line
 			position.x = settings.position.x
 			position.y = settings.position.y - text_metrics.height

@@ -36,19 +36,20 @@ A workaround is to do like this instead:
 ## Supported tags
 The following tags are supported:
 
-| Tag   | Description                                    | Example                               |
-|-------|------------------------------------------------|---------------------------------------|
-| b     | The text should be bold                        | `<b>Foobar</b>`                       |
-| i     | The text should be italic                      | `<i>Foobar</i>`                       |
-| size  | Change text size, relative to default size     | `<size="2">Twice as large</size>`     |
-| color | Change text color                              | `<color=red>Foobar</color>`           |
-|       |                                                | `<color=1.0,0,0,1.0>Foobar</color>`   |
-|       |                                                | `<color=#ff0000>Foobar</color>`       |
-|       |                                                | `<color=#ff0000ff>Foobar</color>`     |
-| font  | Change font                                    | `<font=MyCoolFont>Foobar</font>`      |
-| img   | Display image                                  | `<img=texture:image/>`                |
-| spine | Display spine model                            | `<spine=scene:anim/>`                 |
-| br    | Insert a line break (see notes on linebreak)   | `<br/>`                               |
+| Tag   | Description                                    | Example                                     |
+|-------|------------------------------------------------|---------------------------------------------|
+| b     | The text should be bold                        | `<b>Foobar</b>`                             |
+| i     | The text should be italic                      | `<i>Foobar</i>`                             |
+| size  | Change text size, relative to default size     | `<size="2">Twice as large</size>`           |
+| color | Change text color                              | `<color=red>Foobar</color>`                 |
+|       |                                                | `<color=1.0,0,0,1.0>Foobar</color>`         |
+|       |                                                | `<color=#ff0000>Foobar</color>`             |
+|       |                                                | `<color=#ff0000ff>Foobar</color>`           |
+| font  | Change font                                    | `<font=MyCoolFont>Foobar</font>`            |
+| img   | Display image                                  | `<img=texture:image/>`                      |
+| spine | Display spine model                            | `<spine=scene:anim/>`                       |
+| br    | Insert a line break (see notes on linebreak)   | `<br/>`                                     |
+| nobr  | Prevent the text from breaking                 | `Words <nobr>inside tag</nobr> won't break` |
 
 ### Line breaks
 Note that there is no need for the HTML `<br/>` tag since line breaks (i.e. `\n`) are parsed and presented by the system. Note that a single `<br>` (ie without a closing or empty tag) isn't supported (even though most browsers accept it).
