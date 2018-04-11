@@ -184,6 +184,15 @@ The `metrics` table contains the following values:
 * `height` (number) - Height of the text
 * `char_count` (number) - Number of characters in the text including whitespace and images
 
+A word in the `words` table contains the following values:
+
+* `size` (number) - Size of the word
+* `color` (vector3) - Color of the word
+* `node` (node) - The GUI node representing the word
+* `metrics` (table) - Word metrics (`width`, `height`, `total_width` and additionally for text nodes: `max_descent`, `max_ascent`)
+* `font` (string) - Font name
+* `text` (string) - Word text (empty for non text nodes)
+
 
 ### richtext.tagged(words, tag)
 Get all words with a specific tag.
@@ -197,11 +206,14 @@ Get all words with a specific tag.
 
 
 ### richtext.truncate(words, length)
-Truncate a text such that only a specific number of characters and images are visible. The function will disable nodes that shouldn't be seen at all and updates the text in nodes that should be partially visible.
+Truncate a text such that only a specific number of characters and images are visible. The function will disable nodes that shouldn't be seen at all and updates the text in nodes that should be partially visible. The text metrics of a truncated word will be updated.
 
 **PARAMETERS**
 * `words` (table) - The words to truncate, as received by a call to `richtext.create()`.
 * `length` (number) - Maximum number of characters or images to show.
+
+**RETURNS**
+* `word` (table) - The last visible word.
 
 
 ### richtext.length(text)
