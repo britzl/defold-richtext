@@ -164,17 +164,22 @@ local function get_text_metrics(word, font, text)
 	text = text or word.text
 	font = font or word.font
 
-	-- get metrics of node with and without trailing whitespace
-	local metrics = gui.get_text_metrics(font, text)
-	metrics.width = metrics.width * word.size
-	metrics.height = metrics.height * word.size
-
-	-- get width of text with trailing whitespace included
-	local trailing_whitespace = get_trailing_whitespace(word.text)
-	if #trailing_whitespace > 0 then
-		metrics.total_width = metrics.width + (#trailing_whitespace * get_space_width(font) * word.size)
+	if #text == 0 then
+		metrics = gui.get_text_metrics(font, "|")
+		metrics.width = 0
+		metrics.total_width = 0
 	else
-		metrics.total_width = metrics.width
+		metrics = gui.get_text_metrics(font, text)
+		metrics.width = metrics.width * word.size
+		metrics.height = metrics.height * word.size
+
+		-- get width of text with trailing whitespace included
+		local trailing_whitespace = get_trailing_whitespace(word.text)
+		if #trailing_whitespace > 0 then
+			metrics.total_width = metrics.width + (#trailing_whitespace * get_space_width(font) * word.size)
+		else
+			metrics.total_width = metrics.width
+		end
 	end
 	return metrics
 end
@@ -382,7 +387,7 @@ function M.characters(word)
 		gui.set_layer(char.node, layer)
 		return { char }
 	end
-	
+
 	-- split word into characters
 	local chars = {}
 	local chars_width = 0
