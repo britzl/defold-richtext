@@ -1,7 +1,7 @@
 [project]
 title = RichText
 version = 1.0.0
-dependencies = https://github.com/britzl/defold-timer/archive/1.1.1.zip
+dependencies = 
 
 [bootstrap]
 main_collection = /example/example.collectionc

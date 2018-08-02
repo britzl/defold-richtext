@@ -66,7 +66,7 @@ local function create_truncate_example()
 	local words, metrics = richtext.create("This text should be shown one <img=smileys:cyclops/> at a time...", "Roboto-Regular", settings)
 	local length = 0
 	richtext.truncate(words, length)
-	timer.repeating(0.1, function()
+	timer.delay(0.1, true, function()
 		length = (length + 1) % (metrics.char_count + 1)
 		
 		local last_word = richtext.truncate(words, length)
