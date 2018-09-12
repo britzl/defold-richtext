@@ -10,6 +10,12 @@ M.ALIGN_RIGHT = hash("ALIGN_RIGHT")
 local V3_ZERO = vmath.vector3(0)
 local V3_ONE = vmath.vector3(1)
 
+local id_counter = 0
+
+local function new_id(prefix)
+	id_counter = id_counter + 1
+	return hash((prefix or "") .. tostring(id_counter))
+end
 
 local function round(v)
 	if type(v) == "number" then
@@ -130,6 +136,7 @@ end
 
 local function create_box_node(word)
 	local node = gui.new_box_node(V3_ZERO, V3_ZERO)
+	gui.set_id(node, new_id("box"))
 	gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
 	gui.set_texture(node, word.image.texture)
 	gui.set_scale(node, vmath.vector3(word.size))
@@ -147,6 +154,7 @@ end
 
 local function create_spine_node(word)
 	local node = gui.new_spine_node(V3_ZERO, word.spine.scene)
+	gui.set_id(node, new_id("spine"))
 	gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
 	gui.set_scale(node, vmath.vector3(word.size))
 	gui.play_spine_anim(node, word.spine.anim, gui.PLAYBACK_LOOP_FORWARD)
@@ -188,6 +196,7 @@ end
 local function create_text_node(word, font)
 	assert(font)
 	local node = gui.new_text_node(V3_ZERO, word.text)
+	gui.set_id(node, new_id("textnode"))
 	gui.set_font(node, font)
 	gui.set_color(node, word.color)
 	gui.set_scale(node, V3_ONE * word.size)
