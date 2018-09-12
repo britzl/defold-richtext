@@ -328,6 +328,31 @@ function M.create(text, font, settings)
 end
 
 
+--- Detected click/touch events on words with an anchor tag
+-- These words act as "hyperlinks" and will generate a message when clicked
+-- @param words Words to search for anchor tags
+-- @param action The action table from on_input
+-- @return true if a word was clicked, otherwise false
+function M.on_click(words, action)
+	for i=1,#words do
+		local word = words[i]
+		if word.anchor and gui.pick_node(word.node, action.x, action.y) then
+			if word.tags and word.tags.a then
+				local message = {
+					node_id = gui.get_id(word.node),
+					text = word.text,
+					x = action.x, y = action.y,
+					screen_x = action.screen_x, screen_y = action.screen_y
+				}
+				msg.post("#", word.tags.a, message)
+				return true
+			end
+		end
+	end
+	return false
+end
+
+
 --- Get all words with a specific tag
 -- @param words The words to search (as received from richtext.create)
 -- @param tag The tag to search for. Nil to search for words without a tag

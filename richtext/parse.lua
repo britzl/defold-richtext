@@ -14,6 +14,8 @@ local function parse_tag(tag, params)
 		settings.bold = true
 	elseif tag == "i" then
 		settings.italic = true
+	elseif tag == "a" then
+		settings.anchor = true
 	elseif tag == "br" then
 		settings.linebreak = true
 	elseif tag == "img" then

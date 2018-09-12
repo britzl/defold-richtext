@@ -56,6 +56,12 @@ local function create_align_example()
 end
 
 
+local function create_clickable_words_example(self)
+	local settings = { position = vmath.vector3(10, 130, 0) }
+	return richtext.create("Click <color=red><a=click_text>here</a></color> or perhaps <color=green><a=click_text>here</a></color> to generate a message", "Roboto-Regular", settings)
+end
+
+
 local function create_truncate_example()
 	-- add a "cursor" that should follow at the end of the text as it is revealed
 	local cursor = gui.new_box_node(vmath.vector3(), vmath.vector3(2,35,1))
@@ -123,10 +129,26 @@ end
 
 
 function init(self)
+	msg.post(".", "acquire_input_focus")
 	create_complex_example()
 	create_align_example()
 	create_truncate_example()
 	create_characters_example()
 	create_spine_example()
 	create_nobreak_example()
+	self.clickable_words = create_clickable_words_example()
+end
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("click_text") then
+		gui.animate(gui.get_node("flower"), gui.PROP_POSITION, gui.get_position(gui.get_node(message.node_id)), gui.EASING_INOUTQUAD, 1)
+	end
+end
+
+
+function on_input(self, action_id, action)
+	if action_id == hash("touch") and action.released then
+		return richtext.on_click(self.clickable_words, action)
+	end
 end
