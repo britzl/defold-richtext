@@ -230,8 +230,8 @@ end
 -- @return words
 -- @return metrics
 function M.create(text, font, settings)
-	assert(text)
-	assert(font)
+	assert(text, "You must provide a text")
+	assert(font, "You must provide a font")
 	settings = settings or {}
 	settings.align = settings.align or M.ALIGN_LEFT
 	settings.fonts = settings.fonts or {}
