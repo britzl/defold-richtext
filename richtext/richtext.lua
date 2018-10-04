@@ -202,6 +202,8 @@ local function create_text_node(word, font)
 	gui.set_scale(node, V3_ONE * word.size)
 
 	local metrics = get_text_metrics(word, font)
+	gui.set_size_mode(node, gui.SIZE_MODE_MANUAL)
+	gui.set_size(node, vmath.vector3(metrics.width, metrics.height, 0))
 	return node, metrics
 end
 
