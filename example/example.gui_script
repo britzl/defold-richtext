@@ -58,7 +58,7 @@ end
 
 local function create_clickable_words_example(self)
 	local settings = { position = vmath.vector3(10, 130, 0) }
-	return richtext.create("Click <color=red><a=click_text>here</a></color> or perhaps <color=green><a=click_text>here</a></color> to generate a message", "Roboto-Regular", settings)
+	return richtext.create("Click <color=red><a=click_text>here</a></color> or <color=green><a=click_text>here</a></color> to generate a message", "Roboto-Regular", settings)
 end
 
 
