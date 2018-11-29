@@ -1,4 +1,5 @@
 local color = require "richtext.color"
+local utf8 = require("richtext.utf8")
 
 local M = {}
 
@@ -64,7 +65,7 @@ local function split_line(line, settings, words)
 		local first = words[wi + 1]
 		first.text = ws_start .. first.text
 		local last = words[#words]
-		last.text = last.text:sub(1,#last.text - 1) .. ws_end
+		last.text = utf8.sub(last.text, 1, utf8.len(last.text) - 1) .. ws_end
 	end
 end
 
@@ -75,7 +76,6 @@ local function split_text(text, settings, words)
 	assert(text)
 	assert(settings)
 	assert(words)
-
 	-- special treatment of empty text with a linebreak <br/>
 	if text == "" and settings.linebreak then
 		add_word(text, settings, words)
@@ -117,7 +117,7 @@ local function find_tag(text)
 	if not before_start_tag or not tag or not after_start_tag then
 		return nil
 	end
-	
+
 	-- parse the tag, split into name and optional parameters
 	local name, params, empty = tag:match("<(%a+)=?(%S-)(/?)>")
 
@@ -180,12 +180,9 @@ function M.parse(text, word_settings)
 	return all_words
 end
 
-
 --- Get the length of a text, excluding any tags (except image and spine tags)
 function M.length(text)
-	-- treat image and spine tags as a single character
-	return #text:gsub("<img.-/>", " "):gsub("<spine.-/>", " "):gsub("<.->", "")
+	return utf8.len(text:gsub("<img.-/>", " "):gsub("<spine.-/>", " "):gsub("<.->", ""))
 end
-
 
 return M
