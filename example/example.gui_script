@@ -74,7 +74,7 @@ local function create_truncate_example()
 	richtext.truncate(words, length)
 	timer.delay(0.1, true, function()
 		length = (length + 1) % (metrics.char_count + 1)
-		
+
 		local last_word = richtext.truncate(words, length)
 		local pos = vmath.vector3(settings.position)
 		if last_word then
@@ -86,13 +86,8 @@ local function create_truncate_example()
 	end)
 end
 
-
-local function create_characters_example()
-	local settings = { position = vmath.vector3(0, 290, 0) }
-	local words, metrics = richtext.create("Our <wave><color=#ff69b4>princess</color></wave> is in another <wave=25><color=red>castle</color></wave>", "Roboto-Regular", settings)
-	
-	local waves = richtext.tagged(words, "wave")
-	for _,wave in pairs(waves) do
+local function wave_words(words)
+	for _,wave in pairs(words) do
 		local chars = richtext.characters(wave)
 		gui.delete_node(wave.node)
 		for i,char in ipairs(chars) do
@@ -111,6 +106,12 @@ local function create_characters_example()
 	end
 end
 
+local function create_characters_example()
+	local settings = { position = vmath.vector3(0, 290, 0) }
+	local words, metrics = richtext.create("Our <wave><color=#ff69b4>princess</color></wave> is in another <wave=25><color=red>castle</color></wave>", "Roboto-Regular", settings)
+	wave_words(richtext.tagged(words, "wave"))
+end
+
 
 local function create_spine_example()
 	local settings = { position = vmath.vector3(320, 450, 0), align = richtext.ALIGN_CENTER }
@@ -120,13 +121,16 @@ end
 
 local function create_language_example()
 	local settings_latin = { position = vmath.vector3(20, 410, 0), align = richtext.ALIGN_LEFT }
-	richtext.create("The quick brown fox", "Roboto-Regular", settings_latin)
+	local latin = richtext.create("The <wave>quick</wave> brown fox", "Roboto-Regular", settings_latin)
+	wave_words(richtext.tagged(latin, "wave"))
 
 	local settings_russian = { position = vmath.vector3(20, 380, 0), align = richtext.ALIGN_LEFT }
-	richtext.create("Быстрая коричневая лиса", "Roboto-Regular", settings_russian)
+	local russian = richtext.create("Быстрая <wave>коричневая</wave> лиса", "Roboto-Regular", settings_russian)
+	wave_words(richtext.tagged(russian, "wave"))
 
 	local settings_korean = { position = vmath.vector3(20, 350, 0), align = richtext.ALIGN_LEFT }
-	richtext.create("빠른 갈색 여우", "UnYetgul-Regular", settings_korean)
+	local korean = richtext.create("빠른 <wave>갈색</wave> 여우", "UnYetgul-Regular", settings_korean)
+	wave_words(richtext.tagged(korean, "wave"))
 end
 
 
