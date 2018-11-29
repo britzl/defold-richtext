@@ -1,4 +1,5 @@
 local parser = require "richtext.parse"
+local utf8 =require("richtext.utf8")
 
 local M = {}
 
@@ -26,7 +27,7 @@ local function round(v)
 end
 
 
-function deepcopy(orig)
+local function deepcopy(orig)
 	local orig_type = type(orig)
 	local copy
 	if orig_type == 'table' then
@@ -127,7 +128,7 @@ function M.length(text)
 		for i=1,#text do
 			local word = text[i]
 			local is_text_node = not word.image and not word.spine
-			count = count + (is_text_node and #word.text or 1)
+			count = count + (is_text_node and utf8.len(word.text) or 1)
 		end
 		return count
 	end
@@ -172,7 +173,8 @@ local function get_text_metrics(word, font, text)
 	text = text or word.text
 	font = font or word.font
 
-	if #text == 0 then
+	local metrics
+	if utf8.len(text) == 0 then
 		metrics = gui.get_text_metrics(font, "|")
 		metrics.width = 0
 		metrics.total_width = 0
@@ -269,17 +271,17 @@ function M.create(text, font, settings)
 		--print("word: [" .. word.text .. "]")
 
 		-- get font to use based on word tags
-		local font = get_font(word, settings.fonts)
+		local font_for_word = get_font(word, settings.fonts)
 
 		-- create node and get metrics
-		word.node, word.metrics = create_node(word, settings.parent, font)
+		word.node, word.metrics = create_node(word, settings.parent, font_for_word)
 
 		-- assign layer
 		local layer = get_layer(word, settings.layers)
 		if layer then
 			gui.set_layer(word.node, layer)
 		end
-		
+
 		-- does the word fit on the line or does it overflow?
 		local overflow = (settings.width and (line_width + word.metrics.width) > settings.width)
 		if overflow and not word.nobr then
@@ -382,10 +384,10 @@ function M.truncate(words, length)
 	assert(length)
 	local count = 0
 	local last_visible_word = nil
-	for i=1,#words do
+	for i=1, #words do
 		local word = words[i]
 		local is_text_node = not word.image and not word.spine
-		local word_length = is_text_node and #word.text or 1
+		local word_length = is_text_node and utf8.len(word.text) or 1
 		local visible = count < length
 		last_visible_word = visible and word or last_visible_word
 		gui.set_enabled(word.node, visible)
@@ -394,11 +396,11 @@ function M.truncate(words, length)
 			-- partial word?
 			if count + word_length > length then
 				local overflow = (count + word_length) - length
-				text = word.text:sub(1, word_length - overflow)
+				text = utf8.sub(word.text, 1, word_length - overflow)
 			end
 			gui.set_text(word.node, text)
 			word.metrics = get_text_metrics(word, word.font, text)
-		end	
+		end
 		count = count + word_length
 	end
 	return last_visible_word
@@ -414,9 +416,9 @@ function M.characters(word)
 	local parent = gui.get_parent(word.node)
 	local font = gui.get_font(word.node)
 	local layer = gui.get_layer(word.node)
-	
+
 	-- exit early if word is a single character or empty
-	if #word.text <= 1 then
+	if utf8.len(word.text) <= 1 then
 		local char = deepcopy(word)
 		char.node, char.metrics = create_node(char, parent, font)
 		gui.set_position(char.node, gui.get_position(word.node))
@@ -427,10 +429,10 @@ function M.characters(word)
 	-- split word into characters
 	local chars = {}
 	local chars_width = 0
-	for i=1,#word.text do
+	for i = 1, utf8.len(word.text) do
 		local char = deepcopy(word)
 		chars[#chars + 1] = char
-		char.text = word.text:sub(i,i)
+		char.text = utf8.sub(word.text, i, i)
 		char.node, char.metrics = create_node(char, parent, font)
 		gui.set_layer(char.node, layer)
 		chars_width = chars_width + char.metrics.width

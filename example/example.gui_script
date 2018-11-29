@@ -68,7 +68,7 @@ local function create_truncate_example()
 	gui.set_color(cursor, vmath.vector4(1))
 	gui.set_pivot(cursor, gui.PIVOT_NW)
 
-	local settings = { position = vmath.vector3(0, 260, 0) }
+	local settings = { position = vmath.vector3(0, 240, 0) }
 	local words, metrics = richtext.create("This text should be shown one <img=smileys:cyclops/> at a time...", "Roboto-Regular", settings)
 	local length = 0
 	richtext.truncate(words, length)
@@ -88,7 +88,7 @@ end
 
 
 local function create_characters_example()
-	local settings = { position = vmath.vector3(0, 330, 0) }
+	local settings = { position = vmath.vector3(0, 290, 0) }
 	local words, metrics = richtext.create("Our <wave><color=#ff69b4>princess</color></wave> is in another <wave=25><color=red>castle</color></wave>", "Roboto-Regular", settings)
 	
 	local waves = richtext.tagged(words, "wave")
@@ -113,8 +113,20 @@ end
 
 
 local function create_spine_example()
-	local settings = { position = vmath.vector3(320, 400, 0), align = richtext.ALIGN_CENTER }
+	local settings = { position = vmath.vector3(320, 450, 0), align = richtext.ALIGN_CENTER }
 	richtext.create("A running   <size=0.05><spine=spineboy:run/></size>  in my text", "Roboto-Regular", settings)
+end
+
+
+local function create_language_example()
+	local settings_latin = { position = vmath.vector3(20, 410, 0), align = richtext.ALIGN_LEFT }
+	richtext.create("The quick brown fox", "Roboto-Regular", settings_latin)
+
+	local settings_russian = { position = vmath.vector3(20, 380, 0), align = richtext.ALIGN_LEFT }
+	richtext.create("Быстрая коричневая лиса", "Roboto-Regular", settings_russian)
+
+	local settings_korean = { position = vmath.vector3(20, 350, 0), align = richtext.ALIGN_LEFT }
+	richtext.create("빠른 갈색 여우", "UnYetgul-Regular", settings_korean)
 end
 
 
@@ -135,6 +147,7 @@ function init(self)
 	create_truncate_example()
 	create_characters_example()
 	create_spine_example()
+	create_language_example()
 	create_nobreak_example()
 	self.clickable_words = create_clickable_words_example()
 end

@@ -262,3 +262,4 @@ Right-align text. The words of a line ends at the specified position (see `richt
 
 # Credits
 * Smiley icons in example app from [Flaticons](https://www.flaticon.com/packs/smileys-3)
+* UTF8 decoding from [utf8.lua](https://github.com/Stepets/utf8.lua)

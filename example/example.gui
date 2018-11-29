@@ -23,6 +23,10 @@ fonts {
   name: "Roboto-Regular"
   font: "/example/assets/fonts/Roboto-Regular.font"
 }
+fonts {
+  name: "UnYetgul-Regular"
+  font: "/example/assets/fonts/UnYetgul-Regular.font"
+}
 textures {
   name: "smileys"
   texture: "/example/assets/smileys.atlas"
