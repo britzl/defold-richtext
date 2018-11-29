@@ -1,5 +1,5 @@
 local parser = require "richtext.parse"
-local utf8 =require("richtext.utf8")
+local utf8 = require("richtext.utf8")
 
 local M = {}
 
