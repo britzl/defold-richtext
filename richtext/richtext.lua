@@ -201,6 +201,7 @@ local function create_text_node(word, font)
 	gui.set_id(node, new_id("textnode"))
 	gui.set_font(node, font)
 	gui.set_color(node, word.color)
+	gui.set_outline(node, word.color)
 	gui.set_scale(node, V3_ONE * word.size)
 
 	local metrics = get_text_metrics(word, font)
