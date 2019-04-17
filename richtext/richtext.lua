@@ -178,6 +178,7 @@ local function get_text_metrics(word, font, text)
 		metrics = gui.get_text_metrics(font, "|")
 		metrics.width = 0
 		metrics.total_width = 0
+		metrics.height = metrics.height * word.size
 	else
 		metrics = gui.get_text_metrics(font, text)
 		metrics.width = metrics.width * word.size
