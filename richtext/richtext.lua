@@ -11,6 +11,8 @@ M.ALIGN_RIGHT = hash("ALIGN_RIGHT")
 local V3_ZERO = vmath.vector3(0)
 local V3_ONE = vmath.vector3(1)
 
+local TEXT_NODE_CACHE = {}
+
 local id_counter = 0
 
 local function new_id(prefix)
@@ -86,10 +88,46 @@ local function get_layer(word, layers)
 	return layers.fonts[gui.get_font(node)]
 end
 
+-- compare two words and check that they have the same size, color and font
+local function compare_words(one, two)
+	return one ~= nil and two ~= nil and one.size == two.size and one.color == two.color and one.font == two.font
+end
+
+
+-- combine a list of words to reduce node count as much as possible
+-- this will only combine text nodes
+-- combined words will be removed from the list and their nodes added
+-- to a node cache for reuse
+-- @param words The words to combine
+-- @param cache The cache to add combined words to
+local function combine_words(words)
+	local previous_word = nil
+	local i = 1
+	while i <= #words do
+		word = words[i]
+		if previous_word and word.text and previous_word.text and compare_words(word, previous_word) then
+			local previous_metrics = previous_word.metrics
+			local current_metrics = word.metrics
+			previous_word.text = previous_word.text .. word.text
+			previous_metrics.width = previous_metrics.width + current_metrics.width
+			previous_metrics.height = math.max(previous_metrics.height, current_metrics.height)
+			gui.set_size(previous_word.node, vmath.vector3(previous_metrics.width, previous_metrics.height, 0))
+			gui.set_text(previous_word.node, previous_word.text)
+			table.remove(words, i)
+			TEXT_NODE_CACHE[#TEXT_NODE_CACHE + 1] = word.node
+		else
+			previous_word = word
+			i = i + 1
+		end
+	end
+end
 
 -- position all words according to the line alignment and line width
 -- the list of words will be empty after this function is called
 local function position_words(words, line_width, line_height, position, settings)
+	if settings.combine_words then
+		combine_words(words)
+	end
 	if settings.align == M.ALIGN_RIGHT then
 		position.x = position.x - line_width
 	elseif settings.align == M.ALIGN_CENTER then
@@ -197,8 +235,12 @@ end
 
 
 local function create_text_node(word, font)
-	assert(font)
-	local node = gui.new_text_node(V3_ZERO, word.text)
+	local node = table.remove(TEXT_NODE_CACHE)
+	if node then
+		gui.set_text(node, word.text)
+	else
+		node = gui.new_text_node(V3_ZERO, word.text)
+	end
 	gui.set_id(node, new_id("textnode"))
 	gui.set_font(node, font)
 	gui.set_color(node, word.color)
@@ -250,6 +292,7 @@ function M.create(text, font, settings)
 	settings.position = settings.position or V3_ZERO
 	settings.line_spacing = settings.line_spacing or 1
 	settings.image_pixel_grid_snap = settings.image_pixel_grid_snap or false
+	settings.combine_words = settings.combine_words or false
 
 	-- default settings for a word
 	-- will be assigned to each word unless tags override the values
@@ -328,6 +371,10 @@ function M.create(text, font, settings)
 		position.y = settings.position.y - text_metrics.height
 		position_words(line_words, line_width, line_height, position, settings)
 		text_metrics.height = text_metrics.height + line_height
+	end
+
+	while #TEXT_NODE_CACHE > 0 do
+		gui.delete_node(table.remove(TEXT_NODE_CACHE))
 	end
 
 	return words, text_metrics
