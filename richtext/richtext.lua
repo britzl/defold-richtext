@@ -514,8 +514,10 @@ function M.characters(word)
 	local font = gui.get_font(word.node)
 	local layer = gui.get_layer(word.node)
 
+	local word_length = utf8.len(word.text)
+
 	-- exit early if word is a single character or empty
-	if utf8.len(word.text) <= 1 then
+	if word_length <= 1 then
 		local char = deepcopy(word)
 		char.node, char.metrics = create_node(char, parent, font)
 		gui.set_position(char.node, gui.get_position(word.node))
@@ -525,25 +527,19 @@ function M.characters(word)
 
 	-- split word into characters
 	local chars = {}
-	local chars_width = 0
-	for i = 1, utf8.len(word.text) do
+	local position = gui.get_position(word.node)
+	local position_x = position.x
+
+	for i = 1, word_length do
 		local char = deepcopy(word)
 		chars[#chars + 1] = char
 		char.text = utf8.sub(word.text, i, i)
 		char.node, char.metrics = create_node(char, parent, font)
 		gui.set_layer(char.node, layer)
-		chars_width = chars_width + char.metrics.width
-	end
 
-	-- position each character
-	-- take into account that the sum of the width of the individual
-	-- characters differ from the width of the entire word
-	local position = gui.get_position(word.node)
-	local spacing = (word.metrics.width - chars_width) / (#chars - 1)
-	for i=1,#chars do
-		local char = chars[i]
+		local sub_metrics = get_text_metrics(word, font, utf8.sub(word.text, 1, i))
+		position.x = position_x + sub_metrics.width - char.metrics.width
 		gui.set_position(char.node, position)
-		position.x = position.x + char.metrics.width + spacing
 	end
 
 	return chars
