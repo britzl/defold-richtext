@@ -86,9 +86,29 @@ local function get_layer(word, layers)
 	return layers.fonts[gui.get_font(node)]
 end
 
--- compare two words and check that they have the same size, color and font
+-- compare two words and check that they have the same size, color, font and tags
 local function compare_words(one, two)
-	return one ~= nil and two ~= nil and one.size == two.size and one.color == two.color and one.font == two.font
+	if one == nil or two == nil or one.size ~= two.size or one.color ~= two.color or one.font ~= two.font then
+		return false
+	end
+	local one_tags, two_tags = one.tags, two.tags
+	if one_tags == two_tags then
+		return true
+	end
+	if one_tags == nil or two_tags == nil then
+		return false
+	end
+	for k, v in pairs(one_tags) do
+		if two_tags[k] ~= v then
+			return false
+		end
+	end
+	for k, v in pairs(two_tags) do
+		if one_tags[k] ~= v then
+			return false
+		end
+	end
+	return true
 end
 
 
