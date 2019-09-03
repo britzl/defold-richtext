@@ -91,22 +91,21 @@ local function create_truncate_example()
 	end)
 end
 
-local function wave_words(words)
+local function wave_words(words, notColor)
 	for _,wave in pairs(words) do
 		local chars = richtext.characters(wave)
 		gui.delete_node(wave.node)
 		for i,char in ipairs(chars) do
 			local pos = gui.get_position(char.node)
-			local pos_2 = gui.get_position(char.node)
-			pos_2.y = pos_2.y - 3
-			pos_2.x = pos_2.x + 2
-			gui.set_position(char.node, pos_2)
 			local amplitude = tonumber(wave.tags.wave) or 3
 			gui.animate(char.node, gui.PROP_POSITION, pos + vmath.vector3(0, amplitude, 0), gui.EASING_INOUTSINE, 0.6, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
-			gui.animate(char.node, "color.x", 0.9, gui.EASING_INOUTSINE, 0.2, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
-			gui.animate(char.node, "color.y", 0.9, gui.EASING_INOUTSINE, 0.6, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
-			gui.animate(char.node, "color.z", 0.9, gui.EASING_INOUTSINE, 10, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
-			gui.animate(char.node, "scale", 1.2, gui.EASING_INOUTSINE, 1.5, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
+			if not notColor then
+				gui.animate(char.node, "color.x", 0.9, gui.EASING_INOUTSINE, 0.2, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
+				gui.animate(char.node, "color.y", 0.9, gui.EASING_INOUTSINE, 0.6, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
+				gui.animate(char.node, "color.z", 0.9, gui.EASING_INOUTSINE, 10, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
+			end
+			local scale = gui.get_scale(char.node).x * 1.2
+			gui.animate(char.node, "scale", scale, gui.EASING_INOUTSINE, 1.5, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
 		end
 	end
 end
@@ -147,6 +146,25 @@ local function create_nobreak_example()
 	richtext.create("The image at the end should end up on a new line <img=smileys:cyclops/>", "Roboto-Regular", settings_right)
 end
 
+local function create_overlapping_tags_example()
+	local settings_overlap = {
+		fonts = {
+			Roboto = {
+				regular = hash("Roboto-Regular"),
+				italic = hash("Roboto-Italic"),
+				bold = hash("Roboto-Bold"),
+				bold_italic = hash("Roboto-BoldItalic"),
+			},
+		},
+		position = vmath.vector3(0, 650, 0),
+	}
+	local text = "<size=0.5>You can even <i>overlap tags<size=0.65> like italic <b>bold italic : </i>bold regular</b> back to normal,\n" ..
+			"<color=red>or <color=#98e9f8>nest</color> tags with the <wave=1>same</size> name. Red text, <color=yellow>nested <b>" ..
+			"yellow,</color> back to</b> red,</color> no</wave>rmal."
+	local words = richtext.create(text, "Roboto", settings_overlap)
+	wave_words(richtext.tagged(words, "wave"), true)
+	return words
+end
 
 
 function init(self)
@@ -160,6 +178,7 @@ function init(self)
 	create_language_example()
 	create_nobreak_example()
 	self.clickable_words = create_clickable_words_example()
+	create_overlapping_tags_example()
 end
 
 
