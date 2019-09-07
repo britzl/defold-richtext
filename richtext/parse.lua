@@ -38,6 +38,7 @@ local function parse_tag(tag, params)
 	elseif tag == "nobr" then
 		settings.nobr = true
 	end
+	settings.tag = tag
 
 	return settings
 end
@@ -117,76 +118,81 @@ local function split_text(text, settings, words)
 	end
 end
 
-
--- find tag in text
--- return the tag, tag params and any text before and after the tag
-local function find_tag(text)
-	assert(text)
-	-- find tag, end if no tag was found
-	local before_start_tag, tag, after_start_tag = text:match("(.-)(</?%S->)(.*)")
-	if not before_start_tag or not tag or not after_start_tag then
-		return nil
+-- merge one tag into another
+local function merge_tags(dst, src)
+	for k,v in pairs(src) do
+		if k ~= "tags" then
+			dst[k] = v
+		end
 	end
-
-	-- parse the tag, split into name and optional parameters
-	local name, params, empty = tag:match("<(%a+)=?(%S-)(/?)>")
-
-	-- empty tag, ie tag without content
-	-- example <br/> and <img=texture:image/>
-	if empty == "/" then
-		return before_start_tag, name, params, "", after_start_tag
-	end
-
-	-- find end tag
-	local inside_tag, after_end_tag = after_start_tag:match("(.-)</" .. name .. ">(.*)")
-	-- no end tag, treat the rest of the text as inside the tag
-	if not inside_tag then
-		return before_start_tag, name, params, after_start_tag, ""
-	-- end tag found
-	else
-		return before_start_tag, name, params, inside_tag, after_end_tag
+	for tag,params in pairs(src.tags or {}) do
+		dst.tags[tag] = (params == "") and true or params
 	end
 end
 
-
 --- Parse the text into individual words
 -- @param text The text to parse
--- @param word_settings Default settings for each word
+-- @param default_settings Default settings for each word
 -- @return List of all words
-function M.parse(text, word_settings)
+function M.parse(text, default_settings)
 	assert(text)
-	assert(word_settings)
+	assert(default_settings)
+
 	local all_words = {}
-	repeat
-		local before, tag, params, text_in_tag, after = find_tag(text)
-		-- no more tags? Split and add the entire string
-		if not tag then
+	local open_tags = {}
+	while true do
+		-- merge list of word settings from defaults and all open tags
+		local word_settings = { tags = {}}
+		merge_tags(word_settings, default_settings)
+		for _,open_tag in ipairs(open_tags) do
+			merge_tags(word_settings, open_tag)
+		end
+
+		-- find next tag, with the text before and after the tag
+		local before_tag, tag, after_tag = text:match("(.-)(</?%S->)(.*)")
+
+		-- no more tags, split and add rest of the text
+		if not before_tag or not tag or not after_tag then
 			split_text(text, word_settings, all_words)
 			break
 		end
 
 		-- split and add text before the encountered tag
 		if before ~= "" then
-			split_text(before, word_settings, all_words)
+			split_text(before_tag, word_settings, all_words)
 		end
 
-		-- parse the tag and merge settings
-		local tag_settings = parse_tag(tag, params)
-		for k,v in pairs(word_settings) do
-			tag_settings[k] = tag_settings[k] or v
-		end
-		for tag,params in pairs(word_settings.tags or {}) do
-			tag_settings.tags[tag] = (params == "") and true or params
+		-- parse the tag, split into name and optional parameters
+		local endtag, name, params, empty = tag:match("<(/?)(%a+)=?(%S-)(/?)>")
+
+		local is_endtag = endtag == "/"
+		local is_empty = empty == "/"
+		if is_empty then
+			-- empty tag, ie tag without content
+			-- example <br/> and <img=texture:image/>
+			local tag_settings = parse_tag(name, params)
+			merge_tags(word_settings, tag_settings)
+			add_word("", word_settings, all_words)
+		elseif not is_endtag then
+			-- open tag - parse and add it
+			local tag_settings = parse_tag(name, params)
+			open_tags[#open_tags + 1] = tag_settings
+		else
+			-- end tag - remove it from the list of open tags
+			local found = false
+			for i=#open_tags,1,-1 do
+				if open_tags[i].tag == name then
+					table.remove(open_tags, i)
+					found = true
+					break
+				end
+			end
+			if not found then print(("Found end tag '%s' without matching start tag"):format(name)) end
 		end
 
-		-- parse the text in the tag and add the words
-		local inner_words = M.parse(text_in_tag, tag_settings)
-		for _,word in ipairs(inner_words) do
-			all_words[#all_words + 1] = word
-		end
-
-		text = after
-	until text == ""
+		-- parse text after the tag on the next iteration
+		text = after_tag
+	end
 	return all_words
 end
 
