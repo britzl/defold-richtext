@@ -35,7 +35,7 @@ local function create_complex_example()
 				[hash("spineboy")] = hash("spine-spineboy"),
 			},
 		},
-		width = 400,
+		width = 410,
 		position = vmath.vector3(0, 0, 0),
 		parent = gui.get_node("bg"),
 		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
