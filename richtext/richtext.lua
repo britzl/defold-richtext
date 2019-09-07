@@ -8,6 +8,9 @@ M.ALIGN_LEFT = hash("ALIGN_LEFT")
 M.ALIGN_RIGHT = hash("ALIGN_RIGHT")
 
 
+local V4_ZERO = vmath.vector4(0)
+local V4_ONE = vmath.vector4(1)
+
 local V3_ZERO = vmath.vector3(0)
 local V3_ONE = vmath.vector3(1)
 
@@ -88,7 +91,13 @@ end
 
 -- compare two words and check that they have the same size, color, font and tags
 local function compare_words(one, two)
-	if one == nil or two == nil or one.size ~= two.size or one.color ~= two.color or one.font ~= two.font then
+	if one == nil
+	or two == nil
+	or one.size ~= two.size
+	or one.color ~= two.color
+	or one.shadow ~= two.shadow
+	or one.outline ~= two.outline
+	or one.font ~= two.font then
 		return false
 	end
 	local one_tags, two_tags = one.tags, two.tags
@@ -226,7 +235,8 @@ local function create_text_node(word, font, metrics)
 	gui.set_id(node, new_id("textnode"))
 	gui.set_font(node, font)
 	gui.set_color(node, word.color)
-	gui.set_outline(node, word.color)
+	if word.shadow then gui.set_shadow(node, word.shadow) end
+	if word.outline then gui.set_outline(node, word.outline) end
 	gui.set_scale(node, V3_ONE * word.size)
 
 	metrics = metrics or get_text_metrics(word, font)
@@ -298,7 +308,9 @@ function M.create(text, font, settings)
 	settings.layers.fonts = settings.layers.fonts or {}
 	settings.layers.images = settings.layers.images or {}
 	settings.layers.spinescenes = settings.layers.spinescenes or {}
-	settings.color = settings.color or V3_ONE
+	settings.color = settings.color or V4_ONE
+	settings.shadow = settings.shadow or V4_ZERO
+	settings.outline = settings.outline or V4_ZERO
 	settings.position = settings.position or V3_ZERO
 	settings.line_spacing = settings.line_spacing or 1
 	settings.image_pixel_grid_snap = settings.image_pixel_grid_snap or false
@@ -308,6 +320,8 @@ function M.create(text, font, settings)
 	-- will be assigned to each word unless tags override the values
 	local word_settings = {
 		color = settings.color,
+		shadow = settings.shadow,
+		outline = settings.outline,
 		font = font,
 		size = 1
 	}

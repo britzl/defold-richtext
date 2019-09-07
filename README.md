@@ -36,22 +36,30 @@ A workaround is to do like this instead:
 ## Supported tags
 The following tags are supported:
 
-| Tag   | Description                                    | Example                                     |
-|-------|------------------------------------------------|---------------------------------------------|
-| a     | Create a "hyperlink" that generates a message  | `<a=message_id>Foobar</a>`                  |
-|       | when clicked (see `richtext.on_click`)         |                                             |
-| b     | The text should be bold                        | `<b>Foobar</b>`                             |
-| br    | Insert a line break (see notes on linebreak)   | `<br/>`                                     |
-| color | Change text color                              | `<color=red>Foobar</color>`                 |
-|       |                                                | `<color=1.0,0,0,1.0>Foobar</color>`         |
-|       |                                                | `<color=#ff0000>Foobar</color>`             |
-|       |                                                | `<color=#ff0000ff>Foobar</color>`           |
-| font  | Change font                                    | `<font=MyCoolFont>Foobar</font>`            |
-| i     | The text should be italic                      | `<i>Foobar</i>`                             |
-| img   | Display image                                  | `<img=texture:image/>`                      |
-| nobr  | Prevent the text from breaking                 | `Words <nobr>inside tag</nobr> won't break` |
-| size  | Change text size, relative to default size     | `<size=2>Twice as large</size>`             |
-| spine | Display spine model                            | `<spine=scene:anim/>`                       |
+| Tag     | Description                                    | Example                                     |
+|---------| ------------------------------------------------|---------------------------------------------|
+| a       | Create a "hyperlink" that generates a message  | `<a=message_id>Foobar</a>`                  |
+|         | when clicked (see `richtext.on_click`)         |                                             |
+| b       | The text should be bold                        | `<b>Foobar</b>`                             |
+| br      | Insert a line break (see notes on linebreak)   | `<br/>`                                     |
+| color   | Change text color                              | `<color=red>Foobar</color>`                 |
+|         |                                                | `<color=1.0,0,0,1.0>Foobar</color>`         |
+|         |                                                | `<color=#ff0000>Foobar</color>`             |
+|         |                                                | `<color=#ff0000ff>Foobar</color>`           |
+| shadow  | Change text shadow                             | `<shadow=red>Foobar</shadow>`               |
+|         |                                                | `<shadow=1.0,0,0,1.0>Foobar</shadow>`       |
+|         |                                                | `<shadow=#ff0000>Foobar</shadow>`           |
+|         |                                                | `<shadow=#ff0000ff>Foobar</shadow>`         |
+| outline | Change text shadow                             | `<outline=red>Foobar</outline>`             |
+|         |                                                | `<outline=1.0,0,0,1.0>Foobar</outline>`     |
+|         |                                                | `<outline=#ff0000>Foobar</outline>`         |
+|         |                                                | `<outline=#ff0000ff>Foobar</outline>`       |
+| font    | Change font                                    | `<font=MyCoolFont>Foobar</font>`            |
+| i       | The text should be italic                      | `<i>Foobar</i>`                             |
+| img     | Display image                                  | `<img=texture:image/>`                      |
+| nobr    | Prevent the text from breaking                 | `Words <nobr>inside tag</nobr> won't break` |
+| size    | Change text size, relative to default size     | `<size=2>Twice as large</size>`             |
+| spine   | Display spine model                            | `<spine=scene:anim/>`                       |
 
 ### Line breaks
 Note that there is no need for the HTML `<br/>` tag since line breaks (i.e. `\n`) are parsed and presented by the system. Note that a single `<br>` (ie without a closing or empty tag) isn't supported (even though most browsers accept it).
@@ -113,9 +121,10 @@ A more complex example with different fonts, colors, inline images and automatic
 		width = 400,
 		parent = gui.get_node("bg"),
 		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
+		shadow = vmath.vector4(0.0, 0.0, 0.0, 1.0),
 	}
 
-	local text = "<size=3>RichText</size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry/>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
+	local text = "<size=3><outline=green><RichText</outline></size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry/>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
 
 	richtext.create(text, "Roboto", settings)
 
@@ -139,6 +148,8 @@ The `settings` table can contain the following values:
 * `fonts` (table) - Table with fonts, keyed on font name. See separate section below. If no `fonts` table is provided the font used will be the one passed to `richtext.create()`.
 * `layers` (table) - Table with font, texture and spine scene mappings to layer names. See separate section below.
 * `color` (vector4) - The default color of text. Will be white if not specified.
+* `shadow` (vector4) - The default shadow color of text. Will be transparent if not specified.
+* `outline` (vector4) - The default outline color of text. Will be transparent if not specified.
 * `align` (hash) - One of `richtext.ALIGN_LEFT`, `richtext.ALIGN_CENTER` and `richtext.ALIGN_RIGHT`. Defaults to `richtext.ALIGN_LEFT`. Defines how the words of a line of text are positioned in relation the provided `position`.
 * `line_spacing` (number) - Value to multiply line height with. Set to a value lower than 1.0 to reduce space between lines and a value higher than 1.0 to increase space between lines. Defaults to 1.0.
 * `image_pixel_grid_snap` (boolean) - Set to true to position image on full pixels (positions rounded to nearest integer) to avoid effects of anti-aliasing. Defaults to false.
@@ -191,7 +202,9 @@ The `metrics` table contains the following values:
 A word in the `words` table contains the following values:
 
 * `size` (number) - Size of the word
-* `color` (vector3) - Color of the word
+* `color` (vector4) - Color of the word
+* `shadow` (vector4) - Shadow color of the word
+* `outline` (vector4) - Outline color of the word
 * `node` (node) - The GUI node representing the word
 * `metrics` (table) - Word metrics (`width`, `height`, `total_width` and additionally for text nodes: `max_descent`, `max_ascent`)
 * `font` (string) - Font name

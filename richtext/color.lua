@@ -45,7 +45,7 @@ M.COLORS = {
 }
 
 function M.parse(c)
-	return M.COLORS[c] or M.parse_hex(c) or  M.parse_decimal(c)
+	return M.COLORS[c] or M.parse_hex(c) or M.parse_decimal(c)
 end
 
 

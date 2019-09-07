@@ -7,6 +7,10 @@ local function parse_tag(tag, params)
 	local settings = { tags = { [tag] = params } }
 	if tag == "color" then
 		settings.color = color.parse(params)
+	elseif tag == "shadow" then
+		settings.shadow = color.parse(params)
+	elseif tag == "outline" then
+		settings.outline = color.parse(params)
 	elseif tag == "font" then
 		settings.font = params
 	elseif tag == "size" then
