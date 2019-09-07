@@ -490,24 +490,33 @@ end
 -- and images are visible
 -- @param words List of words to truncate
 -- @param length Maximum number of characters to show
-function M.truncate(words, length)
+-- @param options Optional table with truncate options. Available options are: full_word
+function M.truncate(words, length, options)
 	assert(words)
 	assert(length)
 	local count = 0
+	local previous_visible_word = nil
 	local last_visible_word = nil
 	for i=1, #words do
 		local word = words[i]
 		local is_text_node = not word.image and not word.spine
 		local word_length = is_text_node and utf8.len(word.text) or 1
 		local visible = count < length
-		last_visible_word = visible and word or last_visible_word
+		previous_visible_word, last_visible_word = last_visible_word, (visible and word or last_visible_word)
 		gui.set_enabled(word.node, visible)
 		if count < length and is_text_node then
 			local text = word.text
 			-- partial word?
 			if count + word_length > length then
-				local overflow = (count + word_length) - length
-				text = utf8.sub(word.text, 1, word_length - overflow)
+				if options and options.full_word then
+					-- truncate to full words
+					gui.set_enabled(word.node, false)
+					last_visible_word = previous_visible_word
+				else
+					-- remove overflowing characters from word
+					local overflow = (count + word_length) - length
+					text = utf8.sub(word.text, 1, word_length - overflow)
+				end
 			end
 			gui.set_text(word.node, text)
 			word.metrics = get_text_metrics(word, word.font, text)
