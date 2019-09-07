@@ -24,15 +24,6 @@ Nested elements are supported. Use this to give a section of text a combination 
 
 This is a <b>bold <i>italic</i></b> statement!
 
-### Important note about nested elements!
-It is currently not possible to nest elements of the same tag. This means that the following will not work:
-
-	This <color=green>will <color=red>not</color> work</color>
-
-A workaround is to do like this instead:
-
-	This <color=green>will</color> <color=red>not</color> <color=green>work</color>
-
 ## Supported tags
 The following tags are supported:
 
