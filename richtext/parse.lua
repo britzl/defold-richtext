@@ -45,6 +45,12 @@ end
 
 -- add a single word to the list of words
 local function add_word(text, settings, words)
+	-- handle HTML entities
+	text = text:gsub("&lt;", "<"):gsub("&gt;", ">")
+	if text:find("&nbsp;") then
+		text = text:gsub("&nbsp;", " ")
+	end
+	
 	local data = { text = text }
 	for k,v in pairs(settings) do
 		data[k] = v
