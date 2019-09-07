@@ -147,7 +147,25 @@ local function create_nobreak_example()
 	richtext.create("The image at the end should end up on a new line <img=smileys:cyclops/>", "Roboto-Regular", settings_right)
 end
 
-
+local function create_overlapping_tags_example()
+	local settings_overlap = {
+		fonts = {
+			Roboto = {
+				regular = hash("Roboto-Regular"),
+				italic = hash("Roboto-Italic"),
+				bold = hash("Roboto-Bold"),
+				bold_italic = hash("Roboto-BoldItalic"),
+			},
+		},
+		position = vmath.vector3(0, 650, 0),
+	}
+	local text = "<size=0.5>You can even <i>overlap tags<size=0.65> like italic <b>bold italic : </i>bold regular</b> back to normal,\n" ..
+	"<color=red>or <color=#98e9f8>nest</color> tags with the <wave=1>same</size> name. Red text, <color=yellow>nested <b>" ..
+	"yellow,</color> back to</b> red,</color> no</wave>rmal."
+	local words = richtext.create(text, "Roboto", settings_overlap)
+	wave_words(richtext.tagged(words, "wave"), true)
+	return words
+end
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
