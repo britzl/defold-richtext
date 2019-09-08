@@ -153,12 +153,14 @@ function M.parse(text, default_settings)
 
 		-- no more tags, split and add rest of the text
 		if not before_tag or not tag or not after_tag then
-			split_text(text, word_settings, all_words)
+			if text ~= "" then
+				split_text(text, word_settings, all_words)
+			end
 			break
 		end
 
 		-- split and add text before the encountered tag
-		if before ~= "" then
+		if before_tag ~= "" then
 			split_text(before_tag, word_settings, all_words)
 		end
 
