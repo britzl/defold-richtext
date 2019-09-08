@@ -223,16 +223,16 @@ Get all words with a specific tag.
 
 
 ### richtext.truncate(words, length, [options])
-Truncate a text such that only a specific number of characters and images are visible. The function will disable nodes that shouldn't be seen at all and updates the text in nodes that should be partially visible. The text metrics of a truncated word will be updated. The function can also truncate down to the nearest full word if it otherwise would have resulted in a partial word.
+Truncate a text down to a specific length. This function has two modes of operation: 1) It can truncate the text on a per word basis or 2) on a per character/image basis. The function will disable nodes that shouldn't be visible and in the case of truncating on a per character basis also update the text in nodes that should be partially visible. The text metrics of a truncated word will be updated.
 
 **PARAMETERS**
 * `words` (table) - The words to truncate, as received by a call to `richtext.create()`.
-* `length` (number) - Maximum number of characters or images to show.
+* `length` (number) - Maximum number of words or characters and images to show.
 * `options` (table) - Optional table with options when truncating.
 
 Available options in the `option` table are:
 
-* `full_word` (boolean) - True if the function should truncate down to the nearest full word instead of truncating to a partial word.
+* `words` (boolean) - True if the function should truncate down to the nearest full word instead of truncating to a partial word.
 
 **RETURNS**
 * `word` (table) - The last visible word.
