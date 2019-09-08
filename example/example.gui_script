@@ -76,11 +76,24 @@ local function create_truncate_example()
 	local settings = { position = vmath.vector3(0, 240, 0) }
 	local words, metrics = richtext.create("This text &zwsp;&zwsp;&zwsp;&zwsp;should be shown one <img=smileys:cyclops/> at a time...", "Roboto-Regular", settings)
 	local length = 0
-	richtext.truncate(words, length)
+	local max_length = #words
+	local options = { words = true }
+	richtext.truncate(words, length, options)
 	timer.delay(0.1, true, function()
-		length = (length + 1) % (metrics.char_count + 1)
+		length = length + 1
+		if length > max_length then
+			-- alternate between truncating full words and per character
+			if options.words then
+				options.words = false
+				max_length = metrics.char_count
+			else
+				options.words = true
+				max_length = #words
+			end
+			length = 0
+		end
 
-		local last_word = richtext.truncate(words, length)
+		local last_word = richtext.truncate(words, length, options)
 		local pos = vmath.vector3(settings.position)
 		if last_word then
 			pos = gui.get_position(last_word.node)
