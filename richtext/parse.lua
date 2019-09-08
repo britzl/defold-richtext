@@ -4,7 +4,7 @@ local utf8 = require("richtext.utf8")
 local M = {}
 
 local function parse_tag(tag, params)
-	local settings = { tags = { [tag] = params } }
+	local settings = { tags = { [tag] = params }, tag = tag }
 	if tag == "color" then
 		settings.color = color.parse(params)
 	elseif tag == "shadow" then
@@ -38,7 +38,6 @@ local function parse_tag(tag, params)
 	elseif tag == "nobr" then
 		settings.nobr = true
 	end
-	settings.tag = tag
 
 	return settings
 end
@@ -47,10 +46,7 @@ end
 -- add a single word to the list of words
 local function add_word(text, settings, words)
 	-- handle HTML entities
-	text = text:gsub("&lt;", "<"):gsub("&gt;", ">")
-	if text:find("&nbsp;") then
-		text = text:gsub("&nbsp;", " ")
-	end
+	text = text:gsub("&lt;", "<"):gsub("&gt;", ">"):gsub("&nbsp;", " "):gsub("&zwsp;", "\226\128\139")
 	
 	local data = { text = text }
 	for k,v in pairs(settings) do

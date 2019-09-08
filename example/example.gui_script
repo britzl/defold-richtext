@@ -35,7 +35,7 @@ local function create_complex_example()
 				[hash("spineboy")] = hash("spine-spineboy"),
 			},
 		},
-		width = 410,
+		width = 460,
 		position = vmath.vector3(0, 0, 0),
 		parent = gui.get_node("bg"),
 		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
@@ -74,7 +74,7 @@ local function create_truncate_example()
 	gui.set_pivot(cursor, gui.PIVOT_NW)
 
 	local settings = { position = vmath.vector3(0, 240, 0) }
-	local words, metrics = richtext.create("This text should be shown one <img=smileys:cyclops/> at a time...", "Roboto-Regular", settings)
+	local words, metrics = richtext.create("This text should be shown one <img=smileys:cyclops/> at a time...&zwsp;&zwsp;&zwsp;&zwsp;", "Roboto-Regular", settings)
 	local length = 0
 	local max_length = #words
 	local options = { words = true }

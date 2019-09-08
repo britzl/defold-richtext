@@ -89,7 +89,7 @@ The RichText library has limited support for HTML entities (reserved characters)
 * `&gt;` converts into `>`
 * `&lt;` converts into `<`
 * `&nbsp;` converts into a non-breaking space between two words, ie `100&nbsp;km` becomes `100 km` with `100` and `km` acting as a single word with a space between.
-
+* `&zwsp;` converts into a zero-width space character (`\226\128\139`). This is not an official HTML entity but it is provided as a convenient way to insert one into text.
 
 # Usage
 The RichText library will create gui text nodes representing the markup in the text passed to the library. It will search for tags and split the entire text into words, where each word contains additional meta-data that is used to create and configure text nodes. This means that the library will create as many text nodes as there are words in the text.
