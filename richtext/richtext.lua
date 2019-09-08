@@ -490,29 +490,45 @@ end
 -- and images are visible
 -- @param words List of words to truncate
 -- @param length Maximum number of characters to show
-function M.truncate(words, length)
+-- @param options Optional table with truncate options. Available options are: words
+-- @return Last visible word
+function M.truncate(words, length, options)
 	assert(words)
 	assert(length)
-	local count = 0
 	local last_visible_word = nil
-	for i=1, #words do
-		local word = words[i]
-		local is_text_node = not word.image and not word.spine
-		local word_length = is_text_node and utf8.len(word.text) or 1
-		local visible = count < length
-		last_visible_word = visible and word or last_visible_word
-		gui.set_enabled(word.node, visible)
-		if count < length and is_text_node then
-			local text = word.text
-			-- partial word?
-			if count + word_length > length then
-				local overflow = (count + word_length) - length
-				text = utf8.sub(word.text, 1, word_length - overflow)
+	if options and options.words then
+		for i=1, #words do
+			local word = words[i]
+			local visible = i <= length
+			if visible then
+				last_visible_word = word
 			end
-			gui.set_text(word.node, text)
-			word.metrics = get_text_metrics(word, word.font, text)
+			gui.set_enabled(word.node, visible)
 		end
-		count = count + word_length
+	else
+		local count = 0
+		for i=1, #words do
+			local word = words[i]
+			local is_text_node = not word.image and not word.spine
+			local word_length = is_text_node and utf8.len(word.text) or 1
+			local visible = count < length
+			if visible then
+				last_visible_word = word
+			end
+			gui.set_enabled(word.node, visible)
+			if count < length and is_text_node then
+				local text = word.text
+				-- partial word?
+				if count + word_length > length then
+					-- remove overflowing characters from word
+					local overflow = (count + word_length) - length
+					text = utf8.sub(word.text, 1, word_length - overflow)
+				end
+				gui.set_text(word.node, text)
+				word.metrics = get_text_metrics(word, word.font, text)
+			end
+			count = count + word_length
+		end
 	end
 	return last_visible_word
 end
