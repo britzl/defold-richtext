@@ -2,9 +2,19 @@ local richtext = require "richtext.richtext"
 
 local sherlock = [[At three o'clock precisely I was at Baker Street, but Holmes had not yet returned. The landlady informed me that he had left the house shortly after eight o'clock in the morning. I sat down beside the fire, however, with the intention of awaiting him, however long he might be. I was already deeply interested in his inquiry, for, though it was surrounded by none of the grim and strange features which were associated with the two crimes which I have already recorded, still, the nature of the case and the exalted station of his client gave it a character of its own. Indeed, apart from the nature of the investigation which my friend had on hand, there was something in his masterly grasp of a situation, and his keen, incisive reasoning, which made it a pleasure to me to study his system of work, and to follow the quick, subtle methods by which he disentangled the most inextricable mysteries. So accustomed was I to his invariable success that the very possibility of his failing had ceased to enter into my head.  It was close upon four before the door opened, and a drunken-looking groom, ill-kempt and side-whiskered, with an inflamed face and disreputable clothes, walked into the room. Accustomed as I was to my friend's amazing powers in the use of disguises, I had to look three times before I was certain that it was indeed he. With a nod he vanished into the bedroom, whence he emerged in five minutes tweed-suited and respectable, as of old. Putting his hands into his pockets, he stretched out his legs in front of the fire and laughed heartily for some minutes.  'Well, really!' he cried, and then he choked and laughed again until he was obliged to lie back, limp and helpless, in the chair.  'What is it?'  'It's quite too funny. I am sure you could never guess how I employed my morning, or what I ended by doing.'  'I can't imagine. I suppose that you have been watching the habits, and perhaps the house, of Miss Irene Adler.'  'Quite so; but the sequel was rather unusual. I will tell you, however. I left the house a little after eight o'clock this morning in the character of a groom out of work. There is a wonderful sympathy and freemasonry among horsey men. Be one of them, and you will know all that there is to know. I soon found Briony Lodge. It is a bijou villa, with a garden at the back, but built out in front right up to the road, two stories. Chubb lock to the door. Large sitting-room on the right side, well furnished, with long windows almost to the floor, and those preposterous English window fasteners which a child could open. Behind there was nothing remarkable, save that the passage window could be reached from the top of the coach-house. I walked round it and examined it closely from every point of view, but without noting anything else of interest.  'I then lounged down the street and found, as I expected, that there was a mews in a lane which runs down by one wall of the garden. I lent the ostlers a hand in rubbing down their horses, and received in exchange twopence, a glass of half and half, two fills of shag tobacco, and as much information as I could desire about Miss Adler, to say nothing of half a dozen other people in the neighbourhood in whom I was not in the least interested, but whose biographies I was compelled to listen to.']]
 
+local function merge(...)
+	local out = {}
+	for _,words in pairs({...}) do
+		for _,word in pairs(words) do
+			table.insert(out, word)
+		end
+	end
+	return out
+end
+
 local function create_long_text_example()
-	local settings = { position = vmath.vector3(10, 1100, 0), width = 600, combine_words = true }
-	richtext.create(sherlock, "Roboto-Regular", settings)
+	local settings = { position = vmath.vector3(10, 1075, 0), width = 600, combine_words = true }
+	return richtext.create(sherlock, "Roboto-Regular", settings)
 end
 
 local function create_complex_example()
@@ -49,15 +59,20 @@ local function create_complex_example()
 
 	-- adjust background to cover text
 	gui.set_size(settings.parent, vmath.vector3(metrics.width, metrics.height, 0))
+	return words
 end
 
 
 local function create_align_example()
+	local settings_align_left = { position = vmath.vector3(10, 310, 0), align = richtext.ALIGN_LEFT }
+	local left = richtext.create("Left align this text\nDo it for both lines", "Roboto-Regular", settings_align_leftb)
+
 	local settings_align_right = { position = vmath.vector3(640, 200, 0), align = richtext.ALIGN_RIGHT }
-	richtext.create("Right align this text\nDo it for both lines", "Roboto-Regular", settings_align_right)
+	local right = richtext.create("Right align this text\nDo it for both lines", "Roboto-Regular", settings_align_right)
 
 	local settings_align_center = { position = vmath.vector3(320, 90, 0), align = richtext.ALIGN_CENTER }
-	richtext.create("Center words around the specified position\nAnd these words as well", "Roboto-Regular", settings_align_center)
+	local center = richtext.create("Center words around the specified position\nAnd these words as well", "Roboto-Regular", settings_align_center)
+	return merge(left, right, center)
 end
 
 
@@ -69,9 +84,7 @@ end
 
 local function create_truncate_example()
 	-- add a "cursor" that should follow at the end of the text as it is revealed
-	local cursor = gui.new_box_node(vmath.vector3(), vmath.vector3(2,35,1))
-	gui.set_color(cursor, vmath.vector4(1))
-	gui.set_pivot(cursor, gui.PIVOT_NW)
+	local cursor = gui.get_node("cursor")
 
 	local settings = { position = vmath.vector3(0, 240, 0) }
 	local words, metrics = richtext.create("This text should be shown one <img=smileys:cyclops/> at a time...&zwsp;&zwsp;&zwsp;&zwsp;", "Roboto-Regular", settings)
@@ -79,7 +92,11 @@ local function create_truncate_example()
 	local max_length = #words
 	local options = { words = true }
 	richtext.truncate(words, length, options)
-	timer.delay(0.1, true, function()
+	timer.delay(0.1, true, function(self, handle, time_elapsed)
+		if #words == 0 then
+			timer.cancel(handle)
+			return
+		end
 		length = length + 1
 		if length > max_length then
 			-- alternate between truncating full words and per character
@@ -102,12 +119,21 @@ local function create_truncate_example()
 		gui.set_position(cursor, pos)
 		gui.set_enabled(cursor, not gui.is_enabled(cursor))
 	end)
+	return words
 end
 
 local function wave_words(words)
-	for _,wave in pairs(words) do
-		local chars = richtext.characters(wave)
+	local waves = richtext.tagged(words, "wave")
+	
+	for _,wave in pairs(waves) do
+		for i,word in ipairs(words) do
+			if word == wave then
+				table.remove(words, i)
+				break
+			end
+		end
 		gui.delete_node(wave.node)
+		local chars = richtext.characters(wave)
 		for i,char in ipairs(chars) do
 			local pos = gui.get_position(char.node)
 			local pos_2 = gui.get_position(char.node)
@@ -120,6 +146,7 @@ local function wave_words(words)
 			gui.animate(char.node, "color.y", 0.9, gui.EASING_INOUTSINE, 0.6, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
 			gui.animate(char.node, "color.z", 0.9, gui.EASING_INOUTSINE, 10, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
 			gui.animate(char.node, "scale", 1.2, gui.EASING_INOUTSINE, 1.5, i * 0.12112, nil, gui.PLAYBACK_LOOP_PINGPONG)
+			table.insert(words, char)
 		end
 	end
 end
@@ -127,37 +154,41 @@ end
 local function create_characters_example()
 	local settings = { position = vmath.vector3(0, 290, 0) }
 	local words, metrics = richtext.create("Our <wave><color=#ff69b4>princess</color></wave> is in another <wave=25><color=red>castle</color></wave>", "Roboto-Regular", settings)
-	wave_words(richtext.tagged(words, "wave"))
+	wave_words(words)
+	return words
 end
 
 
 local function create_spine_example()
 	local settings = { position = vmath.vector3(320, 450, 0), align = richtext.ALIGN_CENTER }
-	richtext.create("A running   <size=0.05><spine=spineboy:run/></size>  in my text", "Roboto-Regular", settings)
+	return richtext.create("A running   <size=0.05><spine=spineboy:run/></size>  in my text", "Roboto-Regular", settings)
 end
 
 
 local function create_language_example()
 	local settings_latin = { position = vmath.vector3(20, 410, 0), align = richtext.ALIGN_LEFT }
 	local latin = richtext.create("The <wave>quick</wave> brown fox", "Roboto-Regular", settings_latin)
-	wave_words(richtext.tagged(latin, "wave"))
+	wave_words(latin)
 
 	local settings_russian = { position = vmath.vector3(20, 380, 0), align = richtext.ALIGN_LEFT }
 	local russian = richtext.create("Быстрая <wave>коричневая</wave> лиса", "Roboto-Regular", settings_russian)
-	wave_words(richtext.tagged(russian, "wave"))
+	wave_words(russian)
 
 	local settings_korean = { position = vmath.vector3(20, 350, 0), align = richtext.ALIGN_LEFT }
 	local korean = richtext.create("빠른 <wave>갈색</wave> 여우", "UnYetgul-Regular", settings_korean)
-	wave_words(richtext.tagged(korean, "wave"))
+	wave_words(korean)
+
+	return merge(latin, russian, korean)
 end
 
 
 local function create_nobreak_example()
 	local settings_nobr = { position = vmath.vector3(0, 600, 0), align = richtext.ALIGN_LEFT, width = 245 }
-	richtext.create("The image at the end should end up on a new line <nobr><img=smileys:cyclops/></nobr>", "Roboto-Regular", settings_nobr)
+	local words1 = richtext.create("The image at the end should end up on a new line <nobr><img=smileys:cyclops/></nobr>", "Roboto-Regular", settings_nobr)
 
 	local settings_right = { position = vmath.vector3(320, 600, 0), align = richtext.ALIGN_LEFT, width = 245 }
-	richtext.create("The image at the end should end up on a new line <img=smileys:cyclops/>", "Roboto-Regular", settings_right)
+	local words2 = richtext.create("The image at the end should end up on a new line <img=smileys:cyclops/>", "Roboto-Regular", settings_right)
+	return merge(words1, words2)
 end
 
 local function create_overlapping_tags_example()
@@ -176,21 +207,59 @@ local function create_overlapping_tags_example()
 	"<color=red>or <color=#98e9f8>nest</color> tags with the <wave=1>same</size> name. Red text, <color=yellow>nested <b>" ..
 	"yellow,</color> back to</b> red,</color> no</wave>rmal."
 	local words = richtext.create(text, "Roboto", settings_overlap)
-	wave_words(richtext.tagged(words, "wave"), true)
+	wave_words(words)
 	return words
 end
 
+
+local function create_html_entities()
+	local settings_ltgt = { position = vmath.vector3(20, 900, 0), align = richtext.ALIGN_LEFT, width = 640 }
+	local ltgt = richtext.create("5 &gt; 2 and 2 &lt; 5", "Roboto-Regular", settings_ltgt)
+
+	local settings_nbsp = { position = vmath.vector3(20, 700, 0), align = richtext.ALIGN_LEFT, width = 280 }
+	local nbsp = richtext.create("Some Padding 10 km\nSome Padding 10&nbsp;km", "Roboto-Regular", settings_nbsp)
+
+	local settings_zwsp = { position = vmath.vector3(20, 500, 0), align = richtext.ALIGN_LEFT, width = 640 }
+	local zwsp = richtext.create("There is space&zwsp;&zwsp;&zwsp;&zwsp;here but you barely see it\nThere is no spacehere", "Roboto-Regular", settings_zwsp)
+	print(#zwsp)
+	return merge(ltgt, nbsp, zwsp)
+end
+
+
+
 function init(self)
 	msg.post(".", "acquire_input_focus")
-	--create_long_text_example()
-	create_complex_example()
-	create_align_example()
-	create_truncate_example()
-	create_characters_example()
-	create_spine_example()
-	create_language_example()
-	create_nobreak_example()
-	self.clickable_words = create_clickable_words_example()
+
+	local EXAMPLES = {
+		{ name = "COMPLEX", fn = create_complex_example },
+		{ name = "LONG TEXT", fn = create_long_text_example },
+		{ name = "ALIGN", fn = create_align_example },
+		{ name = "TRUNCATE", fn = create_truncate_example },
+		{ name = "CHARACTERS", fn = create_characters_example },
+		{ name = "SPINE", fn = create_spine_example },
+		{ name = "LANGUAGE", fn = create_language_example },
+		{ name = "NO BREAK", fn = create_nobreak_example },
+		{ name = "CLICKABLE", fn = create_clickable_words_example },
+		{ name = "OVERLAPPING", fn = create_overlapping_tags_example },
+		{ name = "HTML ENTITIES", fn = create_html_entities },
+	}
+
+	self.back = gui.get_node("back/bg")
+	self.buttons = {}
+	for i,example in ipairs(EXAMPLES) do
+		local button = gui.clone_tree(self.back)
+		local text = button[hash("back/text")]
+		local bg = button[hash("back/bg")]
+		local position = vmath.vector3(110 + ((i - 1) % 3) * 210, 1100 - math.floor((i - 1) / 3) * 50, 0)
+		gui.set_position(bg, position)
+		gui.set_text(text, example.name)
+		self.buttons[i] = {
+			node = bg,
+			name = example.name,
+			example = example.fn,
+		}
+	end
+	gui.set_enabled(self.back, false)
 end
 
 
@@ -200,9 +269,47 @@ function on_message(self, message_id, message, sender)
 	end
 end
 
+local function enable_menu(self, enabled)
+	gui.set_enabled(self.back, not enabled)
+	for _,button in ipairs(self.buttons) do
+		gui.set_enabled(button.node, enabled)
+	end
+end
+
+local function delete_words(words)
+	if not words then return end
+	local word = table.remove(words)
+	while word do
+		gui.delete_node(word.node)
+		word = table.remove(words)
+	end
+end
+
+local function pick_node(node, x, y)
+	return gui.is_enabled(node) and gui.pick_node(node, x, y)
+end
 
 function on_input(self, action_id, action)
-	if action_id == hash("touch") and action.released then
-		return richtext.on_click(self.clickable_words, action)
+	if not action_id == hash("touch") or not action.released then
+		return
+	end
+	
+	if pick_node(self.back, action.x, action.y) then
+		enable_menu(self, true)
+		delete_words(self.words)
+		gui.set_position(gui.get_node("flower"), vmath.vector3(0))
+		gui.set_position(gui.get_node("cursor"), vmath.vector3(0))
+		gui.set_size(gui.get_node("bg"), vmath.vector3(0))
+	else
+		-- click on menu button?
+		for _,button in ipairs(self.buttons) do
+			if pick_node(button.node, action.x, action.y) then
+				self.words = button.example(self)
+				enable_menu(self, false)
+				return
+			end
+		end
+	
+		return richtext.on_click(self.words, action)
 	end
 end
