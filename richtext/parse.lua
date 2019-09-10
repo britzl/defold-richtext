@@ -46,7 +46,7 @@ end
 -- add a single word to the list of words
 local function add_word(text, settings, words)
 	-- handle HTML entities
-	text = text:gsub("&lt;", "<"):gsub("&gt;", ">"):gsub("&nbsp;", " "):gsub("&zwsp;", "\226\128\139")
+	text = text:gsub("&lt;", "<"):gsub("&gt;", ">"):gsub("&nbsp;", " ")
 	
 	local data = { text = text }
 	for k,v in pairs(settings) do
@@ -134,6 +134,7 @@ function M.parse(text, default_settings)
 	assert(text)
 	assert(default_settings)
 
+	text = text:gsub("&zwsp;", "<zwsp>\226\128\139</zwsp>")
 	local all_words = {}
 	local open_tags = {}
 	while true do
