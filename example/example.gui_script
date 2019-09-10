@@ -212,7 +212,7 @@ local function create_overlapping_tags_example()
 end
 
 
-local function create_html_entities()
+local function create_html_entities_example()
 	local settings_ltgt = { position = vmath.vector3(20, 900, 0), align = richtext.ALIGN_LEFT, width = 640 }
 	local ltgt = richtext.create("5 &gt; 2 and 2 &lt; 5", "Roboto-Regular", settings_ltgt)
 
@@ -225,7 +225,62 @@ local function create_html_entities()
 	return merge(ltgt, nbsp, zwsp)
 end
 
+local function delay(seconds)
+	local co = coroutine.running()
+	assert(co, "You must call delay() from a coroutine")
+	timer.delay(seconds, false, function()
+		coroutine.resume(co)
+	end)
+	coroutine.yield()
+end
 
+
+local function fade_in(node, easing, duration, delay)
+	local color = gui.get_color(node)
+	local to = vmath.vector4(color)
+	color.w = 0
+	gui.set_color(node, color)
+	gui.animate(node, gui.PROP_COLOR, to, easing, duration, delay)
+end
+
+local function create_fade_in_example()
+	local settings = { position = vmath.vector3(20, 900, 0), align = richtext.ALIGN_LEFT, width = 640 }
+	local words = richtext.create("This is a text that should fade in character by character", "Roboto-Regular", settings)
+
+	local fade_duration = 0.5
+	local fade_delay = 0.1
+	coroutine.wrap(function()
+		-- disable all words
+		for i=1,#words do
+			gui.set_enabled(words[i].node, false)
+		end
+
+		-- iterate over words and fade them in character by character
+		for i=1,#words do
+			local word = words[i]
+			
+			-- split into individual characters and fade in
+			local characters = richtext.characters(word)
+			for i,char in ipairs(characters) do
+				fade_in(char.node, go.EASING_LINEAR, fade_duration, (i - 1) * fade_delay)
+			end
+
+			-- start a timer to delete the individual characters and re-enable original word
+			local max_delay = (#characters - 1) * fade_delay
+			timer.delay(fade_duration + max_delay, false, function()
+				for _,char in ipairs(characters) do
+					gui.delete_node(char.node)
+				end
+				gui.set_enabled(word.node, true)
+			end)
+			
+			-- wait before dealing with the next word
+			delay(max_delay)
+		end
+	end)()
+	
+	return words
+end
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
@@ -241,7 +296,8 @@ function init(self)
 		{ name = "NO BREAK", fn = create_nobreak_example },
 		{ name = "CLICKABLE", fn = create_clickable_words_example },
 		{ name = "OVERLAPPING", fn = create_overlapping_tags_example },
-		{ name = "HTML ENTITIES", fn = create_html_entities },
+		{ name = "HTML ENTITIES", fn = create_html_entities_example },
+		{ name = "FADE IN", fn = create_fade_in_example },
 	}
 
 	self.back = gui.get_node("back/bg")
@@ -310,6 +366,6 @@ function on_input(self, action_id, action)
 			end
 		end
 	
-		return richtext.on_click(self.words, action)
+		return richtext.on_click(self.words or {}, action)
 	end
 end
