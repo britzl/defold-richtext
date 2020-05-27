@@ -148,7 +148,7 @@ The `settings` table can contain the following values:
 * `color` (vector4) - The default color of text. Will be white if not specified.
 * `shadow` (vector4) - The default shadow color of text. Will be transparent if not specified.
 * `outline` (vector4) - The default outline color of text. Will be transparent if not specified.
-* `align` (hash) - One of `richtext.ALIGN_LEFT`, `richtext.ALIGN_CENTER` and `richtext.ALIGN_RIGHT`. Defaults to `richtext.ALIGN_LEFT`. Defines how the words of a line of text are positioned in relation the provided `position`.
+* `align` (hash) - One of `richtext.ALIGN_LEFT`, `richtext.ALIGN_CENTER`, `richtext.ALIGN_RIGHT` and `richtext.ALIGN_JUSTIFY`. Defaults to `richtext.ALIGN_LEFT`. Defines how the words of a line of text are positioned in relation the provided `position`. Width must be specified for `richtext.ALIGN_JUSTIFY`.
 * `line_spacing` (number) - Value to multiply line height with. Set to a value lower than 1.0 to reduce space between lines and a value higher than 1.0 to increase space between lines. Defaults to 1.0.
 * `image_pixel_grid_snap` (boolean) - Set to true to position image on full pixels (positions rounded to nearest integer) to avoid effects of anti-aliasing. Defaults to false.
 * `combine_words` (boolean) - Set to true to combine words with the same style on a line into a single node. This is useful for very long texts where the maximum number of nodes would exceed the limit set in the GUI. The disadvantage is that any per word operations will not work since the words have been combined.
@@ -275,6 +275,9 @@ Center text. The words of a line are centered on the specified position (see `ri
 
 ### richtext.ALIGN_RIGHT
 Right-align text. The words of a line ends at the specified position (see `richtext.create` settings above).
+
+### richtext.ALIGN_JUSTIFT
+Justify text. The words of a line start at the specified position and are spaced such that the last character of the last word ends at the right edge of the line bounds (see `richtext.create` settings above).
 
 
 # Credits

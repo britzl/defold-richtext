@@ -6,6 +6,7 @@ local M = {}
 M.ALIGN_CENTER = hash("ALIGN_CENTER")
 M.ALIGN_LEFT = hash("ALIGN_LEFT")
 M.ALIGN_RIGHT = hash("ALIGN_RIGHT")
+M.ALIGN_JUSTIFY = hash("ALIGN_JUSTIFY")
 
 
 local V4_ZERO = vmath.vector4(0)
@@ -130,6 +131,15 @@ local function position_words(words, line_width, line_height, position, settings
 		position.x = position.x - line_width / 2
 	end
 
+	local spacing = 0
+	if settings.align == M.ALIGN_JUSTIFY and #words > 1 then
+		local words_width = 0
+		for i=1,#words do
+			local word = words[i]
+			words_width = words_width + word.metrics.total_width
+		end
+		spacing = (settings.width - words_width) / (#words - 1)
+	end
 	for i=1,#words do
 		local word = words[i]
 		-- align spine animations to bottom of line since
@@ -143,7 +153,7 @@ local function position_words(words, line_width, line_height, position, settings
 		else
 			gui.set_position(word.node, position)
 		end
-		position.x = position.x + word.metrics.total_width
+		position.x = position.x + word.metrics.total_width + spacing
 		words[i] = nil
 	end
 end
@@ -315,7 +325,10 @@ function M.create(text, font, settings)
 	settings.line_spacing = settings.line_spacing or 1
 	settings.image_pixel_grid_snap = settings.image_pixel_grid_snap or false
 	settings.combine_words = settings.combine_words or false
-
+	if settings.align == M.ALIGN_JUSTIFY and not settings.width then
+		error("Width must be specified if text should be justified")
+	end
+	
 	-- default settings for a word
 	-- will be assigned to each word unless tags override the values
 	local word_settings = {

@@ -64,15 +64,18 @@ end
 
 
 local function create_align_example()
+	local settings_align_justify = { position = vmath.vector3(10, 420, 0), align = richtext.ALIGN_JUSTIFY, width = 300 }
+	local justify = richtext.create("Justify this text\nDo it for both lines", "Roboto-Regular", settings_align_justify)
+
 	local settings_align_left = { position = vmath.vector3(10, 310, 0), align = richtext.ALIGN_LEFT }
-	local left = richtext.create("Left align this text\nDo it for both lines", "Roboto-Regular", settings_align_leftb)
+	local left = richtext.create("Left align this text\nDo it for both lines", "Roboto-Regular", settings_align_left)
 
 	local settings_align_right = { position = vmath.vector3(640, 200, 0), align = richtext.ALIGN_RIGHT }
 	local right = richtext.create("Right align this text\nDo it for both lines", "Roboto-Regular", settings_align_right)
 
 	local settings_align_center = { position = vmath.vector3(320, 90, 0), align = richtext.ALIGN_CENTER }
 	local center = richtext.create("Center words around the specified position\nAnd these words as well", "Roboto-Regular", settings_align_center)
-	return merge(left, right, center)
+	return merge(justify, left, right, center)
 end
 
 
