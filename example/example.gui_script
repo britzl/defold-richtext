@@ -17,6 +17,12 @@ local function create_long_text_example()
 	return richtext.create(sherlock, "Roboto-Regular", settings)
 end
 
+local function create_paragraph_example()
+	local settings = { position = vmath.vector3(10, 1075, 0), width = 600 }
+	local text = "<p>This is some rather long text that wraps around and has 0.5 lines of space after its last line.</p>\n<p=2.5>This one has 2.5 lines of space.</p>\nThis is just regular text."
+	return richtext.create(text, "Roboto-Regular", settings)
+end
+
 local function create_complex_example()
 	local settings = {
 		fonts = {
@@ -301,6 +307,7 @@ function init(self)
 		{ name = "OVERLAPPING", fn = create_overlapping_tags_example },
 		{ name = "HTML ENTITIES", fn = create_html_entities_example },
 		{ name = "FADE IN", fn = create_fade_in_example },
+		{ name = "PARAGRAPHS", fn = create_paragraph_example },
 	}
 
 	self.back = gui.get_node("back/bg")

@@ -323,6 +323,7 @@ function M.create(text, font, settings)
 	settings.outline = settings.outline or V4_ZERO
 	settings.position = settings.position or V3_ZERO
 	settings.line_spacing = settings.line_spacing or 1
+	settings.paragraph_spacing = settings.paragraph_spacing or 0.5
 	settings.image_pixel_grid_snap = settings.image_pixel_grid_snap or false
 	settings.combine_words = settings.combine_words or false
 	if settings.align == M.ALIGN_JUSTIFY and not settings.width then
@@ -347,6 +348,7 @@ function M.create(text, font, settings)
 	local line_words = {}
 	local line_width = 0
 	local line_height = 0
+	local paragraph_spacing = 0
 	local position = vmath.vector3(settings.position)
 	local word_count = #words
 	for i = 1, word_count do
@@ -387,9 +389,10 @@ function M.create(text, font, settings)
 
 			-- update text metrics
 			text_metrics.width = math.max(text_metrics.width, line_width)
-			text_metrics.height = text_metrics.height + (line_height * settings.line_spacing)
+			text_metrics.height = text_metrics.height + (line_height * settings.line_spacing) + paragraph_spacing
 			line_width = word_metrics.total_width
 			line_height = word_metrics.height
+			paragraph_spacing = 0
 		else
 			-- the word fits on the line, add it and update text metrics
 			if combined_metrics then
@@ -418,6 +421,16 @@ function M.create(text, font, settings)
 			word.delete = true
 		end
 
+		if word.paragraph_end then
+			local paragraph = word.paragraph
+			if paragraph then
+				paragraph_spacing = math.max(
+					paragraph_spacing,
+					line_height * (paragraph == true and settings.paragraph_spacing or paragraph)
+				)
+			end
+		end
+
 		-- handle line break
 		if word.linebreak then
 			-- position all words on the line up until the linebreak
@@ -426,9 +439,10 @@ function M.create(text, font, settings)
 			position_words(line_words, line_width, line_height, position, settings)
 
 			-- update text metrics
-			text_metrics.height = text_metrics.height + (line_height * settings.line_spacing)
+			text_metrics.height = text_metrics.height + (line_height * settings.line_spacing) + paragraph_spacing
 			line_height = word_metrics.height
 			line_width = 0
+			paragraph_spacing = 0
 		end
 	end
 

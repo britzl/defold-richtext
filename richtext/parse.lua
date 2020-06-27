@@ -37,6 +37,8 @@ local function parse_tag(tag, params)
 		}
 	elseif tag == "nobr" then
 		settings.nobr = true
+	elseif tag == "p" then
+		settings.paragraph = tonumber(params) or true
 	end
 
 	return settings
@@ -187,6 +189,12 @@ function M.parse(text, default_settings)
 				end
 			end
 			if not found then print(("Found end tag '%s' without matching start tag"):format(name)) end
+			if name == "p" then
+				local last_word = all_words[#all_words]
+				if last_word then
+					last_word.paragraph_end = true
+				end
+			end
 		end
 
 		-- parse text after the tag on the next iteration
