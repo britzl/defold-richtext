@@ -189,9 +189,15 @@ function M.parse(text, default_settings)
 				end
 			end
 			if not found then print(("Found end tag '%s' without matching start tag"):format(name)) end
-			if name == "p" then
-				local last_word = all_words[#all_words]
-				if last_word then
+		end
+
+		if name == "p" then
+			local last_word = all_words[#all_words]
+			if last_word then
+				if not is_endtag then
+					last_word.linebreak = true
+				end
+				if is_endtag or is_empty then
 					last_word.paragraph_end = true
 				end
 			end
