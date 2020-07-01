@@ -28,7 +28,7 @@ This is a <b>bold <i>italic</i></b> statement!
 The following tags are supported:
 
 | Tag     | Description                                    | Example                                     |
-|---------| ------------------------------------------------|---------------------------------------------|
+|---------|------------------------------------------------|---------------------------------------------|
 | a       | Create a "hyperlink" that generates a message  | `<a=message_id>Foobar</a>`                  |
 |         | when clicked (see `richtext.on_click`)         |                                             |
 | b       | The text should be bold                        | `<b>Foobar</b>`                             |
@@ -51,6 +51,9 @@ The following tags are supported:
 | nobr    | Prevent the text from breaking                 | `Words <nobr>inside tag</nobr> won't break` |
 | size    | Change text size, relative to default size     | `<size=2>Twice as large</size>`             |
 | spine   | Display spine model                            | `<spine=scene:anim/>`                       |
+| p       | Adds extra spacing below the line where this   | `<p>A paragraph</p>\nSome other text`       |
+|         | tag ends. Adds a newline before its opening    | `<p=2.5>This has 2.5 lines of spacing<p>`   |
+|         | tag if it doesn't already exist.               |                                             |
 
 ### Line breaks
 Note that there is no need for the HTML `<br/>` tag since line breaks (i.e. `\n`) are parsed and presented by the system. Note that a single `<br>` (ie without a closing or empty tag) isn't supported (even though most browsers accept it).
@@ -150,6 +153,7 @@ The `settings` table can contain the following values:
 * `outline` (vector4) - The default outline color of text. Will be transparent if not specified.
 * `align` (hash) - One of `richtext.ALIGN_LEFT`, `richtext.ALIGN_CENTER`, `richtext.ALIGN_RIGHT` and `richtext.ALIGN_JUSTIFY`. Defaults to `richtext.ALIGN_LEFT`. Defines how the words of a line of text are positioned in relation the provided `position`. Width must be specified for `richtext.ALIGN_JUSTIFY`.
 * `line_spacing` (number) - Value to multiply line height with. Set to a value lower than 1.0 to reduce space between lines and a value higher than 1.0 to increase space between lines. Defaults to 1.0.
+* `paragraph_spacing` (number) - Space to leave after lines with where `<p>` tags end. Relative to the line height. Defaults to 0.5 lines.
 * `image_pixel_grid_snap` (boolean) - Set to true to position image on full pixels (positions rounded to nearest integer) to avoid effects of anti-aliasing. Defaults to false.
 * `combine_words` (boolean) - Set to true to combine words with the same style on a line into a single node. This is useful for very long texts where the maximum number of nodes would exceed the limit set in the GUI. The disadvantage is that any per word operations will not work since the words have been combined.
 
