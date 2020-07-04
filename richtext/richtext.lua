@@ -8,6 +8,10 @@ M.ALIGN_LEFT = hash("ALIGN_LEFT")
 M.ALIGN_RIGHT = hash("ALIGN_RIGHT")
 M.ALIGN_JUSTIFY = hash("ALIGN_JUSTIFY")
 
+M.VALIGN_TOP = hash("VALIGN_TOP")
+M.VALIGN_MIDDLE = hash("VALIGN_MIDDLE")
+M.VALIGN_BOTTOM = hash("VALIGN_BOTTOM")
+
 
 local V4_ZERO = vmath.vector4(0)
 local V4_ONE = vmath.vector4(1)
@@ -277,7 +281,6 @@ local function create_node(word, parent, font, node, metrics)
 	else
 		node, metrics = create_text_node(word, font, metrics)
 	end
-	gui.set_pivot(node, gui.PIVOT_NW)
 	gui.set_parent(node, parent)
 	gui.set_inherit_alpha(node, true)
 	return node, metrics
@@ -312,6 +315,7 @@ function M.create(text, font, settings)
 	assert(font, "You must provide a font")
 	settings = settings or {}
 	settings.align = settings.align or M.ALIGN_LEFT
+	settings.valign = settings.valign or M.VALIGN_TOP
 	settings.fonts = settings.fonts or {}
 	settings.fonts[font] = settings.fonts[font] or { regular = hash(font) }
 	settings.layers = settings.layers or {}
@@ -329,7 +333,20 @@ function M.create(text, font, settings)
 	if settings.align == M.ALIGN_JUSTIFY and not settings.width then
 		error("Width must be specified if text should be justified")
 	end
-	
+
+	local line_increment_before = 0
+	local line_increment_after = 1
+	local pivot = gui.PIVOT_NW
+	if settings.valign == M.VALIGN_MIDDLE then
+		line_increment_before = 0.5
+		line_increment_after = 0.5
+		pivot = gui.PIVOT_W
+	elseif settings.valign == M.VALIGN_BOTTOM then
+		line_increment_before = 1
+		line_increment_after = 0
+		pivot = gui.PIVOT_SW
+	end
+
 	-- default settings for a word
 	-- will be assigned to each word unless tags override the values
 	local word_settings = {
@@ -380,6 +397,7 @@ function M.create(text, font, settings)
 
 		if overflow and not word.nobr then
 			-- overflow, position the words that fit on the line
+			text_metrics.height = text_metrics.height + (line_height * line_increment_before * settings.line_spacing)
 			position.x = settings.position.x
 			position.y = settings.position.y - text_metrics.height
 			position_words(line_words, line_width, line_height, position, settings)
@@ -389,7 +407,7 @@ function M.create(text, font, settings)
 
 			-- update text metrics
 			text_metrics.width = math.max(text_metrics.width, line_width)
-			text_metrics.height = text_metrics.height + (line_height * settings.line_spacing) + paragraph_spacing
+			text_metrics.height = text_metrics.height + (line_height * line_increment_after * settings.line_spacing) + paragraph_spacing
 			line_width = word_metrics.total_width
 			line_height = word_metrics.height
 			paragraph_spacing = 0
@@ -410,6 +428,7 @@ function M.create(text, font, settings)
 
 		if should_create_node then
 			word.node, word.metrics = create_node(word, settings.parent, font_for_word, node, word_metrics)
+			gui.set_pivot(word.node, pivot)
 
 			-- assign layer
 			local layer = get_layer(word, settings.layers)
@@ -434,12 +453,13 @@ function M.create(text, font, settings)
 		-- handle line break
 		if word.linebreak then
 			-- position all words on the line up until the linebreak
+			text_metrics.height = text_metrics.height + (line_height * line_increment_before * settings.line_spacing)
 			position.x = settings.position.x
 			position.y = settings.position.y - text_metrics.height
 			position_words(line_words, line_width, line_height, position, settings)
 
 			-- update text metrics
-			text_metrics.height = text_metrics.height + (line_height * settings.line_spacing) + paragraph_spacing
+			text_metrics.height = text_metrics.height + (line_height * line_increment_after * settings.line_spacing) + paragraph_spacing
 			line_height = word_metrics.height
 			line_width = 0
 			paragraph_spacing = 0
@@ -448,10 +468,11 @@ function M.create(text, font, settings)
 
 	-- position remaining words
 	if #line_words > 0 then
+		text_metrics.height = text_metrics.height + (line_height * line_increment_before * settings.line_spacing)
 		position.x = settings.position.x
 		position.y = settings.position.y - text_metrics.height
 		position_words(line_words, line_width, line_height, position, settings)
-		text_metrics.height = text_metrics.height + line_height
+		text_metrics.height = text_metrics.height + (line_height * line_increment_after * settings.line_spacing)
 	end
 
 	-- compact words table
@@ -571,6 +592,7 @@ function M.characters(word)
 	local parent = gui.get_parent(word.node)
 	local font = gui.get_font(word.node)
 	local layer = gui.get_layer(word.node)
+	local pivot = gui.get_pivot(word.node)
 
 	local word_length = utf8.len(word.text)
 
@@ -578,6 +600,7 @@ function M.characters(word)
 	if word_length <= 1 then
 		local char = deepcopy(word)
 		char.node, char.metrics = create_node(char, parent, font)
+		gui.set_pivot(char.node, pivot)
 		gui.set_position(char.node, gui.get_position(word.node))
 		gui.set_layer(char.node, layer)
 		return { char }
@@ -594,6 +617,7 @@ function M.characters(word)
 		char.text = utf8.sub(word.text, i, i)
 		char.node, char.metrics = create_node(char, parent, font)
 		gui.set_layer(char.node, layer)
+		gui.set_pivot(char.node, pivot)
 
 		local sub_metrics = get_text_metrics(word, font, utf8.sub(word.text, 1, i))
 		position.x = position_x + sub_metrics.width - char.metrics.width
