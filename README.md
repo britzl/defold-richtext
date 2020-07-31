@@ -211,7 +211,9 @@ The `metrics` table contains the following values:
 
 * `width` (number) - Width of the text
 * `height` (number) - Height of the text
-* `char_count` (number) - Number of characters in the text including whitespace and images
+* `char_count` (number) - Number of characters in the text including whitespace
+* `img_count` (number) - Number of images in the text
+* `spine_count` (number) - Number of spine models in the text
 
 A word in the `words` table contains the following values:
 

@@ -361,6 +361,8 @@ function M.create(text, font, settings)
 		width = 0,
 		height = 0,
 		char_count = 0,
+		img_count = 0,
+		spine_count = 0,
 	}
 	local line_words = {}
 	local line_width = 0
@@ -370,8 +372,13 @@ function M.create(text, font, settings)
 	local word_count = #words
 	for i = 1, word_count do
 		local word = words[i]
-		text_metrics.char_count = text_metrics.char_count + parser.length(word.text)
-		--print("word: [" .. word.text .. "]")
+		if word.image then
+			text_metrics.img_count = text_metrics.img_count + 1
+		elseif word.spine then
+			text_metrics.spine_count = text_metrics.spine_count + 1
+		else
+			text_metrics.char_count = text_metrics.char_count + parser.length(word.text)
+		end
 
 		-- get font to use based on word tags
 		local font_for_word = get_font(word, settings.fonts)
