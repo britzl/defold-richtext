@@ -49,7 +49,7 @@ end
 local function add_word(text, settings, words)
 	-- handle HTML entities
 	text = text:gsub("&lt;", "<"):gsub("&gt;", ">"):gsub("&nbsp;", " ")
-	
+
 	local data = { text = text }
 	for k,v in pairs(settings) do
 		data[k] = v
@@ -171,9 +171,9 @@ function M.parse(text, default_settings)
 		if is_empty then
 			-- empty tag, ie tag without content
 			-- example <br/> and <img=texture:image/>
-			local tag_settings = parse_tag(name, params)
-			merge_tags(word_settings, tag_settings)
-			add_word("", word_settings, all_words)
+			local empty_tag_settings = parse_tag(name, params)
+			merge_tags(empty_tag_settings, word_settings)
+			add_word("", empty_tag_settings, all_words)
 		elseif not is_endtag then
 			-- open tag - parse and add it
 			local tag_settings = parse_tag(name, params)
