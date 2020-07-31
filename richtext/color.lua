@@ -1,7 +1,7 @@
 local M = {}
 
 function M.parse_hex(hex)
-	local r,g,b,a = hex:match("#(%x%x)(%x%x)(%x%x)(%x?%x?)")
+	local r,g,b,a = hex:match("#?(%x%x)(%x%x)(%x%x)(%x?%x?)")
 	if a == "" then a = "ff" end
 	if r and g and b and a then
 		return vmath.vector4(tonumber(r, 16) / 255, tonumber(g, 16) / 255, tonumber(b, 16) / 255, tonumber(a, 16) / 255)
@@ -18,6 +18,13 @@ function M.parse_decimal(dec)
 	return nil
 end
 
+function M.add(name, color)
+	if type(color) == "string" then
+		color = M.parse_hex(color) or M.parse_decimal(color)
+	end
+	assert(type(color) == "userdata" and color.x and color.y and color.z and color.w, "Unable to add color")
+	M.COLORS[name] = color
+end
 
 M.COLORS = {
 	aqua = M.parse_hex("#00ffffff"),

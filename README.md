@@ -86,6 +86,17 @@ The following named colors are supported:
 | white     | `#ffffffff` | ![](https://placehold.it/15/ffffff/000000?text=+) |
 | yellow    | `#ffff00ff` | ![](https://placehold.it/15/ffff00/000000?text=+) |
 
+You can add your own named colors as well:
+
+```lua
+local color = require "richtext.color"
+
+color.add("blood", "#8A0303")
+color.add("asparagus", "#87a96b")
+color.add("denim", "#1560bd")
+```
+
+
 ## HTML entities
 The RichText library has limited support for HTML entities (reserved characters):
 
