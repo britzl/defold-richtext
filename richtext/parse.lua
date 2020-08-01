@@ -175,20 +175,30 @@ function M.parse(text, default_settings)
 			merge_tags(empty_tag_settings, word_settings)
 			add_word("", empty_tag_settings, all_words)
 		elseif not is_endtag then
-			-- open tag - parse and add it
-			local tag_settings = parse_tag(name, params)
-			open_tags[#open_tags + 1] = tag_settings
-		else
-			-- end tag - remove it from the list of open tags
-			local found = false
-			for i=#open_tags,1,-1 do
-				if open_tags[i].tag == name then
-					table.remove(open_tags, i)
-					found = true
-					break
+			if name == "repeat" then
+				local text_to_repeat = after_tag:match("(.*)</repeat>")
+				local repetitions = tonumber(params)
+				if repetitions > 1 then
+					after_tag = text_to_repeat:rep(repetitions - 1) .. after_tag
 				end
+			else
+				-- open tag - parse and add it
+				local tag_settings = parse_tag(name, params)
+				open_tags[#open_tags + 1] = tag_settings
 			end
-			if not found then print(("Found end tag '%s' without matching start tag"):format(name)) end
+		else
+			if name ~= "repeat" then
+				-- end tag - remove it from the list of open tags
+				local found = false
+				for i=#open_tags,1,-1 do
+					if open_tags[i].tag == name then
+						table.remove(open_tags, i)
+						found = true
+						break
+					end
+				end
+				if not found then print(("Found end tag '%s' without matching start tag"):format(name)) end
+			end
 		end
 
 		if name == "p" then

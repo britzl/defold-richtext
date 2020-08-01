@@ -54,6 +54,7 @@ The following tags are supported:
 | p       | Adds extra spacing below the line where this   | `<p>A paragraph</p>\nSome other text`       |
 |         | tag ends. Adds a newline before its opening    | `<p=2.5>This has 2.5 lines of spacing<p>`   |
 |         | tag if it doesn't already exist.               |                                             |
+| repeat  | Repeat the text enclosed by the tag            | `<repeat=5>Echo </repeat> five times`       |
 
 ### Line breaks
 Note that there is no need for the HTML `<br/>` tag since line breaks (i.e. `\n`) are parsed and presented by the system. Note that a single `<br>` (ie without a closing or empty tag) isn't supported (even though most browsers accept it).
