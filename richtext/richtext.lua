@@ -634,5 +634,15 @@ function M.characters(word)
 	return chars
 end
 
+---Removes the gui nodes created by rich text
+function M.remove(words)
+	assert(words)
+
+	local num = #words
+	for i=1,num do
+		gui.delete_node(words[i].node)
+	end
+end
+
 
 return M
