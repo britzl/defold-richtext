@@ -286,6 +286,13 @@ Call this function when a click/touch has been detected and your text contains w
 * `consumed` (boolean) - True if any word was clicked.
 
 
+### richtext.remove(words)
+Removes all gui text nodes created by `richtext.create()`.
+
+**PARAMETERS**
+* `words` (table) - Table of words, as received from a call to `richtext.create()`.
+
+
 ### richtext.ALIGN_LEFT
 Left-align text. The words of a line starts at the specified position (see `richtext.create` settings above).
 
