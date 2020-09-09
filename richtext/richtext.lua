@@ -638,7 +638,7 @@ end
 function M.remove(words)
 	assert(words)
 
-	local num = table.getn(words)
+	local num = #words
 	for i=1,num do
 		gui.delete_node(words[i].node)
 	end
