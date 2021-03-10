@@ -136,13 +136,19 @@ local function position_words(words, line_width, line_height, position, settings
 	end
 
 	local spacing = 0
-	if settings.align == M.ALIGN_JUSTIFY and #words > 1 then
+	if settings.align == M.ALIGN_JUSTIFY then
 		local words_width = 0
+		local word_count = 0
 		for i=1,#words do
 			local word = words[i]
-			words_width = words_width + word.metrics.total_width
+			if word.metrics.total_width > 0 then
+				words_width = words_width + word.metrics.total_width
+				word_count = word_count + 1
+			end
 		end
-		spacing = (settings.width - words_width) / (#words - 1)
+		if word_count > 1 then
+			spacing = (settings.width - words_width) / (word_count - 1)
+		end
 	end
 	for i=1,#words do
 		local word = words[i]
