@@ -137,7 +137,7 @@ A more complex example with different fonts, colors, inline images and automatic
 		shadow = vmath.vector4(0.0, 0.0, 0.0, 1.0),
 	}
 
-	local text = "<size=3><outline=green><RichText</outline></size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry/>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
+	local text = "<size=3><outline=green>RichText</outline></size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry/>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
 
 	richtext.create(text, "Roboto", settings)
 
