@@ -39,6 +39,8 @@ local function parse_tag(tag, params)
 		settings.nobr = true
 	elseif tag == "p" then
 		settings.paragraph = tonumber(params) or true
+	else
+		settings[tag] = params
 	end
 
 	return settings
