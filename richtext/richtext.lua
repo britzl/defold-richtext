@@ -55,11 +55,6 @@ local function get_trailing_whitespace(text)
 end
 
 
-local function get_space_width(font)
-	return gui.get_text_metrics(font, " _").width - gui.get_text_metrics(font, "_").width
-end
-
-
 local function get_font(word, fonts)
 	local font_settings = fonts[word.font]
 	local font = nil
@@ -237,14 +232,7 @@ local function get_text_metrics(word, font, text)
 		metrics = gui.get_text_metrics(font, text)
 		metrics.width = metrics.width * word.size
 		metrics.height = metrics.height * word.size
-
-		-- get width of text with trailing whitespace included
-		local trailing_whitespace = get_trailing_whitespace(word.text)
-		if #trailing_whitespace > 0 then
-			metrics.total_width = metrics.width + (#trailing_whitespace * get_space_width(font) * word.size)
-		else
-			metrics.total_width = metrics.width
-		end
+		metrics.total_width = metrics.width
 	end
 	return metrics
 end
