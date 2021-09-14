@@ -57,7 +57,7 @@ local function create_complex_example()
 				[hash("spineboy")] = hash("spine-spineboy"),
 			},
 		},
-		width = 460,
+		width = 480,
 		position = vmath.vector3(0, 0, 0),
 		parent = gui.get_node("bg"),
 		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
@@ -197,13 +197,17 @@ local function create_language_example()
 end
 
 
-local function create_nobreak_example()
+local function create_linebreak_example()
 	local settings_nobr = { position = vmath.vector3(0, 600, 0), align = richtext.ALIGN_LEFT, width = 245 }
 	local words1 = richtext.create("The image at the end should end up on a new line <nobr><img=smileys:cyclops/></nobr>", "Roboto-Regular", settings_nobr)
 
 	local settings_right = { position = vmath.vector3(320, 600, 0), align = richtext.ALIGN_LEFT, width = 245 }
 	local words2 = richtext.create("The image at the end should end up on a new line <img=smileys:cyclops/>", "Roboto-Regular", settings_right)
-	return merge(words1, words2)
+
+	local settings_nobr = { position = vmath.vector3(0, 900, 0), align = richtext.ALIGN_LEFT, width = 245 }
+	local longword = richtext.create("THIS IS AVERYLONGWORDWITHOUTANYLINEBREAKS", "Roboto-Regular", settings_nobr)
+
+	return merge(words1, words2, longword)
 end
 
 local function create_overlapping_tags_example()
@@ -320,7 +324,7 @@ function init(self)
 		{ name = "CHARACTERS", fn = create_characters_example },
 		{ name = "SPINE", fn = create_spine_example },
 		{ name = "LANGUAGE", fn = create_language_example },
-		{ name = "NO BREAK", fn = create_nobreak_example },
+		{ name = "LINEBREAK", fn = create_linebreak_example },
 		{ name = "CLICKABLE", fn = create_clickable_words_example },
 		{ name = "OVERLAPPING", fn = create_overlapping_tags_example },
 		{ name = "HTML ENTITIES", fn = create_html_entities_example },

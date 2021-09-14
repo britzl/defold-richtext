@@ -296,6 +296,27 @@ local function measure_node(word, font, previous_word)
 	return metrics, combined_metrics, node
 end
 
+local function split_word(word, font, max_width)
+	local one = deepcopy(word)
+	local two = deepcopy(word)
+	local text = word.text
+	local metrics = get_text_metrics(one, font)
+	local char_count = utf8.len(text)
+	local split_index = math.floor(char_count * (max_width / metrics.total_width))
+	local rest = ""
+	while split_index > 1 do
+		one.text = utf8.sub(text, 1, split_index)
+		one.linebreak = true
+		metrics = get_text_metrics(one, font)
+		if metrics.width <= max_width then
+			rest = utf8.sub(text, split_index + 1)
+			break
+		end
+		split_index = split_index - 1
+	end
+	two.text = rest
+	return one, two
+end
 
 
 --- Create rich text gui nodes from text
@@ -364,7 +385,8 @@ function M.create(text, font, settings)
 	local paragraph_spacing = 0
 	local position = vmath.vector3(settings.position)
 	local word_count = #words
-	for i = 1, word_count do
+	local i = 1
+	repeat
 		local word = words[i]
 		if word.image then
 			text_metrics.img_count = text_metrics.img_count + 1
@@ -390,12 +412,29 @@ function M.create(text, font, settings)
 		local word_metrics, combined_metrics, node = measure_node(word, font_for_word, previous_word)
 		local should_create_node = true
 
-		-- does the word fit on the line or does it overflow?
-		local overflow = (settings.width and ((combined_metrics
-			and (line_width - previous_word.metrics.total_width + combined_metrics.width)
-			or (line_width + word_metrics.width)
-		) > settings.width))
+		-- check if the line overflows due to this word
+		local overflow = false
+		if settings.width then
+			if combined_metrics then
+				overflow = (line_width - previous_word.metrics.total_width + combined_metrics.width) > settings.width
+			else
+				overflow = (line_width + word_metrics.width)  > settings.width
+			end
 
+			-- if we overflow and the word is longer than a full line we
+			-- split the word and add the first part to the current line
+			if overflow and word.text and word_metrics.width > settings.width then
+				local remaining_width = settings.width - line_width
+				local one, two = split_word(word, font_for_word, remaining_width)
+				word_metrics, combined_metrics, node = measure_node(one, font_for_word, previous_word)
+				words[i] = one
+				word = one
+				table.insert(words, i + 1, two)
+				word_count = word_count + 1
+				overflow = false
+			end
+		end
+		
 		if overflow and not word.nobr then
 			-- overflow, position the words that fit on the line
 			text_metrics.height = text_metrics.height + (line_height * line_increment_before * settings.line_spacing)
@@ -465,7 +504,9 @@ function M.create(text, font, settings)
 			line_width = 0
 			paragraph_spacing = 0
 		end
-	end
+
+		i = i + 1
+	until i > word_count
 
 	-- position remaining words
 	if #line_words > 0 then
