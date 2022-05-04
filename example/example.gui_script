@@ -306,6 +306,7 @@ end
 local function create_repeat_example()
 	local settings = { position = vmath.vector3(320, 450, 0), align = richtext.ALIGN_CENTER, fonts = { Roboto = ROBOTO } }
 	return richtext.create("Now repeat<repeat=7>\n<b>after <color=red><i>me</i></color></b></repeat>\nWell done!", "Roboto", settings)
+end
 
 local function create_custom_tag_example()
 	local settings = { position = vmath.vector3(320, 450, 0), align = richtext.ALIGN_CENTER, fonts = { Roboto = ROBOTO } }
