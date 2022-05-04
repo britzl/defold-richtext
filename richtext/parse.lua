@@ -1,45 +1,11 @@
-local color = require "richtext.color"
 local utf8 = require("richtext.utf8")
+local tags = require("richtext.tags")
 
 local M = {}
 
 local function parse_tag(tag, params)
 	local settings = { tags = { [tag] = params }, tag = tag }
-	if tag == "color" then
-		settings.color = color.parse(params)
-	elseif tag == "shadow" then
-		settings.shadow = color.parse(params)
-	elseif tag == "outline" then
-		settings.outline = color.parse(params)
-	elseif tag == "font" then
-		settings.font = params
-	elseif tag == "size" then
-		settings.size = tonumber(params)
-	elseif tag == "b" then
-		settings.bold = true
-	elseif tag == "i" then
-		settings.italic = true
-	elseif tag == "a" then
-		settings.anchor = true
-	elseif tag == "br" then
-		settings.linebreak = true
-	elseif tag == "img" then
-		local texture, anim = params:match("(.-):(.*)")
-		settings.image = {
-			texture = texture,
-			anim = anim
-		}
-	elseif tag == "spine" then
-		local scene, anim = params:match("(.-):(.*)")
-		settings.spine = {
-			scene = scene,
-			anim = anim
-		}
-	elseif tag == "nobr" then
-		settings.nobr = true
-	elseif tag == "p" then
-		settings.paragraph = tonumber(params) or true
-	else
+	if not tags.apply(tag, params, settings) then
 		settings[tag] = params
 	end
 

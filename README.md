@@ -119,29 +119,46 @@ A simple example with some color and linebreaks:
 ## Advanced example
 A more complex example with different fonts, colors, inline images and automatic linebreaks:
 
-	local settings = {
-		fonts = {
-			Roboto = {
-				regular = hash("Roboto-Regular"),
-				italic = hash("Roboto-Italic"),
-				bold = hash("Roboto-Bold"),
-				bold_italic = hash("Roboto-BoldItalic"),
-			},
-			Nanum = {
-				regular = hash("Nanum-Regular"),
-			},
+```lua
+local settings = {
+	fonts = {
+		Roboto = {
+			regular = hash("Roboto-Regular"),
+			italic = hash("Roboto-Italic"),
+			bold = hash("Roboto-Bold"),
+			bold_italic = hash("Roboto-BoldItalic"),
 		},
-		width = 400,
-		parent = gui.get_node("bg"),
-		color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
-		shadow = vmath.vector4(0.0, 0.0, 0.0, 1.0),
-	}
+		Nanum = {
+			regular = hash("Nanum-Regular"),
+		},
+	},
+	width = 400,
+	parent = gui.get_node("bg"),
+	color = vmath.vector4(0.95, 0.95, 1.0, 1.0),
+	shadow = vmath.vector4(0.0, 0.0, 0.0, 1.0),
+}
 
-	local text = "<size=3><outline=green>RichText</outline></size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry/>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
+local text = "<size=3><outline=green>RichText</outline></size>Lorem <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit. <b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry/>accumsan rhoncus.\n\nNunc placerat nibh a purus auctor, id scelerisque massa <size=2>rutrum.</size>"
 
-	richtext.create(text, "Roboto", settings)
+richtext.create(text, "Roboto", settings)
+```
 
 ![](docs/example.png)
+
+## Custom tags
+Custom tags can be accessed and used in two ways:
+
+* Use `richtext.tagged(words, tag)` to get all words with a certain tag, even a custom one
+* Use `tags.register(tag, fn)` to register a custom tag handler:
+
+
+```lua
+	tags.register("boldred", function(params, settings)
+		tags.apply("color", "red", settings)
+		tags.apply("b", nil, settings)
+	end)
+	richtext.create("I am <boldred>bold and red</boldred>!", "Roboto", settings)
+```
 
 
 # API
@@ -173,6 +190,7 @@ The `settings` table can contain the following values:
 
 The `fonts` table should have the following format:
 
+```lua
 	name (string) = {
 		regular (string) = font (hash),
 		italic (string) = font (hash),
@@ -182,11 +200,13 @@ The `fonts` table should have the following format:
 	name (string) = {
 		...
 	},
+```
 
 Where `name` is the name specified in a `<font>` tag and the `font` for each of `regular`, `italic`, `bold` and `bold_italic` should correspond to the name of a font added to a .gui scene.
 
 The `layers` table should map fonts, textures and spine scenes to layer names. It should have the following format:
 
+```lua
 	fonts = {
 		font (hash) = layer (hash),
 		...
@@ -202,6 +222,7 @@ The `layers` table should map fonts, textures and spine scenes to layer names. I
 		...
 		spinescene (hash) = layer (hash),
 	}
+```
 
 Where `layer` is the name of a layer in the .gui scene, `font` is the value returned from a call to `gui.get_font(node)`, `texture` is the value returned from a call to `gui.get_texture(node)` and finally `spinescene` is the value returned from a call to `gui.get_spine_scene(node)`.
 
