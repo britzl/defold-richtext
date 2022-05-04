@@ -178,7 +178,7 @@ function M.parse(text, default_settings)
 			add_word("", empty_tag_settings, all_words)
 		elseif not is_endtag then
 			if name == "repeat" then
-				local text_to_repeat = after_tag:match("(.*)</repeat>")
+				local text_to_repeat = after_tag:match("(.-)</repeat>")
 				local repetitions = tonumber(params)
 				if repetitions > 1 then
 					after_tag = text_to_repeat:rep(repetitions - 1) .. after_tag
