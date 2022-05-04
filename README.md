@@ -157,6 +157,7 @@ The `settings` table can contain the following values:
 
 * `width` (number) - Maximum width of a line of text. Omit this value to present the entire text on a single line
 * `position` (vector3) - The position that the text aligns to (refer to the `align` setting for details). Defaults to 0,0 if not specified.
+* `size` (number) - Default size of any created node. Same as using a `<size=2>` tag in the text. Defaults to 1 if not specified.
 * `parent` (node) - GUI nodes will be attached to this node if specified.
 * `fonts` (table) - Table with fonts, keyed on font name. See separate section below. If no `fonts` table is provided the font used will be the one passed to `richtext.create()`.
 * `layers` (table) - Table with font, texture and spine scene mappings to layer names. See separate section below.

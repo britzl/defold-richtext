@@ -331,6 +331,7 @@ function M.create(text, font, settings)
 	settings = settings or {}
 	settings.align = settings.align or M.ALIGN_LEFT
 	settings.valign = settings.valign or M.VALIGN_TOP
+	settings.size = settings.size or 1
 	settings.fonts = settings.fonts or {}
 	settings.fonts[font] = settings.fonts[font] or { regular = hash(font) }
 	settings.layers = settings.layers or {}
@@ -369,7 +370,7 @@ function M.create(text, font, settings)
 		shadow = settings.shadow,
 		outline = settings.outline,
 		font = font,
-		size = 1
+		size = settings.size
 	}
 	local words = parser.parse(text, word_settings)
 	local text_metrics = {
