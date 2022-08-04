@@ -184,12 +184,29 @@ function M.length(text)
 end
 
 
+local size_vector = vmath.vector3()
 local function create_box_node(word)
 	local node = gui.new_box_node(V3_ZERO, V3_ZERO)
+	local word_image = word.image
+	local image_width = word_image.width
+	local image_height = word_image.height
 	gui.set_id(node, new_id("box"))
-	gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
+	if image_width then
+		gui.set_size_mode(node, gui.SIZE_MODE_MANUAL)
+		size_vector.x = image_width
+		size_vector.y = image_height or image_width
+		size_vector.z = 0
+		gui.set_size(node, size_vector)
+	else
+		gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
+	end
 	gui.set_texture(node, word.image.texture)
-	gui.set_scale(node, vmath.vector3(word.size))
+	local word_size = word.size
+	size_vector.x = word_size
+	size_vector.y = word_size
+	size_vector.z = word_size
+	gui.set_scale(node, size_vector)
+	
 	gui.play_flipbook(node, hash(word.image.anim))
 
 	-- get metrics of node based on image size

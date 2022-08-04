@@ -48,6 +48,8 @@ The following tags are supported:
 | font    | Change font                                    | `<font=MyCoolFont>Foobar</font>`            |
 | i       | The text should be italic                      | `<i>Foobar</i>`                             |
 | img     | Display image                                  | `<img=texture:image/>`                      |
+|		  | Display image in fixed square				   | `<img=texture:image,size>`					 |
+|		  | Display image in fixed rectangle			   | `<img=texture:image,width,height>`			 |
 | nobr    | Prevent the text from breaking                 | `Words <nobr>inside tag</nobr> won't break` |
 | size    | Change text size, relative to default size     | `<size=2>Twice as large</size>`             |
 | spine   | Display spine model                            | `<spine=scene:anim/>`                       |

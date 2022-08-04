@@ -65,9 +65,29 @@ end)
 
 M.register("img", function(params, settings)
 	local texture, anim = params:match("(.-):(.*)")
+	local width, height
+	if anim then
+		temp_anim, width = anim:match("(.-),(.*)")
+		if temp_anim then
+			anim = temp_anim
+		end
+		if width then
+			temp_width, height = width:match("(.-),(.*)")
+			if temp_width then
+				width = temp_width
+			end
+			width = tonumber(width)
+			if height then
+				height = tonumber(height)
+			end	
+		end
+	end
+	
 	settings.image = {
 		texture = texture,
-		anim = anim
+		anim = anim,
+		width = width,
+		height = height
 	}
 end)
 
