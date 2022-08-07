@@ -63,25 +63,27 @@ M.register("nobr", function(params, settings)
 	settings.nobr = true
 end)
 
+-- Split string at first occurrence of token
+-- If the token doesn't exist the whole string is returned
+-- @param s The string to split
+-- @param token The token to split string on
+-- @return before The string before the token or the whole string if token doesn't exist
+-- @return after The string after the token or nul
+local function split(s, token)
+	if not s then return nil, nil end
+	local before, after = s:match("(.-)" .. token .. "(.*)")
+	before = before or s
+	return before, after
+end
+
 M.register("img", function(params, settings)
-	local texture, anim = params:match("(.-):(.*)")
-	local width, height
-	if anim then
-		temp_anim, width = anim:match("(.-),(.*)")
-		if temp_anim then
-			anim = temp_anim
-		end
-		if width then
-			temp_width, height = width:match("(.-),(.*)")
-			if temp_width then
-				width = temp_width
-			end
-			width = tonumber(width)
-			if height then
-				height = tonumber(height)
-			end	
-		end
-	end
+	local texture_and_anim, params = split(params, ",")
+	local width, params = split(params, ",")
+	local height, params = split(params, ",")
+	local texture, anim = split(texture_and_anim, ":")
+
+	width = width and tonumber(width)
+	height = height and tonumber(height) or width
 	
 	settings.image = {
 		texture = texture,

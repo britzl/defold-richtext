@@ -194,7 +194,7 @@ local function create_box_node(word)
 	if image_width then
 		gui.set_size_mode(node, gui.SIZE_MODE_MANUAL)
 		size_vector.x = image_width
-		size_vector.y = image_height or image_width
+		size_vector.y = image_height
 		size_vector.z = 0
 		gui.set_size(node, size_vector)
 	else
