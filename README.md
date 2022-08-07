@@ -48,13 +48,13 @@ The following tags are supported:
 | font    | Change font                                    | `<font=MyCoolFont>Foobar</font>`            |
 | i       | The text should be italic                      | `<i>Foobar</i>`                             |
 | img     | Display image                                  | `<img=texture:image/>`                      |
-|		  | Display image in fixed square				   | `<img=texture:image,size>`					 |
-|		  | Display image in fixed rectangle			   | `<img=texture:image,width,height>`			 |
+|		  | Display image in fixed square				   | `<img=texture:image,size/>`				 |
+|		  | Display image in fixed rectangle			   | `<img=texture:image,width,height/>`		 |
 | nobr    | Prevent the text from breaking                 | `Words <nobr>inside tag</nobr> won't break` |
 | size    | Change text size, relative to default size     | `<size=2>Twice as large</size>`             |
 | spine   | Display spine model                            | `<spine=scene:anim/>`                       |
 | p       | Adds extra spacing below the line where this   | `<p>A paragraph</p>\nSome other text`       |
-|         | tag ends. Adds a newline before its opening    | `<p=2.5>This has 2.5 lines of spacing<p>`   |
+|         | tag ends. Adds a newline before its opening    | `<p=2.5>This has 2.5 lines of spacing</p>`  |
 |         | tag if it doesn't already exist.               |                                             |
 | repeat  | Repeat the text enclosed by the tag            | `<repeat=5>Echo </repeat> five times`       |
 
