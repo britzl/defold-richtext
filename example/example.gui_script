@@ -381,7 +381,9 @@ local function delete_words(words)
 	if not words then return end
 	local word = table.remove(words)
 	while word do
-		gui.delete_node(word.node)
+		if word.node then
+			gui.delete_node(word.node)
+		end
 		word = table.remove(words)
 	end
 end
