@@ -19,19 +19,15 @@ local V4_ONE = vmath.vector4(1)
 local V3_ZERO = vmath.vector3(0)
 local V3_ONE = vmath.vector3(1)
 
+-- temporary v3s (to avoid creating a lot of short-lived v3s)
+local size_v3 = vmath.vector3()
+local position_v3 = vmath.vector3()
+
 local id_counter = 0
 
 local function new_id(prefix)
 	id_counter = id_counter + 1
 	return hash((prefix or "") .. tostring(id_counter))
-end
-
-local function round(v)
-	if type(v) == "number" then
-		return math.floor(v + 0.5)
-	else
-		return vmath.vector3(math.floor(v.x + 0.5), math.floor(v.y + 0.5), math.floor(v.z + 0.5))
-	end
 end
 
 
@@ -50,13 +46,8 @@ local function deepcopy(orig)
 end
 
 
-local function get_trailing_whitespace(text)
-	return text:match("^.-(%s*)$") or ""
-end
-
-
-local function get_font(word, fonts)
-	local font_settings = fonts[word.font]
+local function get_font(word, fonts, default_font)
+	local font_settings = fonts[default_font]
 	local font = nil
 	if font_settings then
 		if word.bold and word.italic then
@@ -73,7 +64,7 @@ local function get_font(word, fonts)
 		end
 	end
 	if not font then
-		font = word.font
+		font = default_font
 	end
 	return font
 end
@@ -151,12 +142,15 @@ local function position_words(words, line_width, line_height, position, settings
 		-- spine animations ignore pivot (always PIVOT_S)
 		if word.spine then
 			position.y = position.y - line_height
-			gui.set_position(word.node, position)
+			word.position_x = position.x
+			word.position_y = position.y
 			position.y = position.y + line_height
 		elseif word.image and settings.image_pixel_grid_snap then
-			gui.set_position(word.node, round(position))
+			word.position_x = math.floor(position.x + 0.5)
+			word.position_y = math.floor(position.y + 0.5)
 		else
-			gui.set_position(word.node, position)
+			word.position_x = position.x
+			word.position_y = position.y
 		end
 		position.x = position.x + word.metrics.total_width + spacing
 		words[i] = nil
@@ -184,147 +178,167 @@ function M.length(text)
 end
 
 
-local size_vector = vmath.vector3()
 local function create_box_node(word)
-	local node = gui.new_box_node(V3_ZERO, V3_ZERO)
+	position_v3.x = word.position_x or 0
+	position_v3.y = word.position_y or 0
+	if not word.node then
+		word.node = gui.new_box_node(position_v3, V3_ZERO)
+	else
+		gui.set_position(word.node, position_v3)
+	end
+
+	local node = word.node
 	local word_image = word.image
 	local image_width = word_image.width
 	local image_height = word_image.height
 	gui.set_id(node, new_id("box"))
 	if image_width then
 		gui.set_size_mode(node, gui.SIZE_MODE_MANUAL)
-		size_vector.x = image_width
-		size_vector.y = image_height
-		size_vector.z = 0
-		gui.set_size(node, size_vector)
+		size_v3.x = image_width
+		size_v3.y = image_height
+		size_v3.z = 0
+		gui.set_size(node, size_v3)
 	else
 		gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
 	end
 	gui.set_texture(node, word.image.texture)
 	local word_size = word.size
-	size_vector.x = word_size
-	size_vector.y = word_size
-	size_vector.z = word_size
-	gui.set_scale(node, size_vector)
-	
+	size_v3.x = word_size
+	size_v3.y = word_size
+	size_v3.z = word_size
+	gui.set_scale(node, size_v3)
 	gui.play_flipbook(node, hash(word.image.anim))
-
-	-- get metrics of node based on image size
-	local size = gui.get_size(node)
-	local metrics = {}
-	metrics.total_width = size.x * word.size
-	metrics.width = size.x * word.size
-	metrics.height = size.y * word.size
-	return node, metrics
 end
 
 
 local function create_spine_node(word)
-	local node = gui.new_spine_node(V3_ZERO, word.spine.scene)
+	position_v3.x = word.position_x or 0
+	position_v3.y = word.position_y or 0
+	if not word.node then
+		word.node = gui.new_spine_node(position_v3, word.spine.scene)
+	else
+		gui.set_position(word.node, position_v3)
+	end
+
+	local node = word.node
 	gui.set_id(node, new_id("spine"))
 	gui.set_size_mode(node, gui.SIZE_MODE_AUTO)
 	gui.set_scale(node, vmath.vector3(word.size))
 	gui.play_spine_anim(node, word.spine.anim, gui.PLAYBACK_LOOP_FORWARD)
-
-	local size = gui.get_size(node)
-	local metrics = {}
-	metrics.total_width = size.x
-	metrics.width = size.x
-	metrics.height = size.y
-	return node, metrics
 end
 
-
-local function get_text_metrics(word, font, text)
+local function get_text_metrics(word, text)
 	text = text or word.text
-	font = font or word.font
 
 	local metrics
 	if utf8.len(text) == 0 then
-		metrics = gui.get_text_metrics(font, "|")
+		metrics = gui.get_text_metrics(word.font, "|")
 		metrics.width = 0
 		metrics.total_width = 0
 		metrics.height = metrics.height * word.size
 	else
-		metrics = gui.get_text_metrics(font, text)
+		metrics = gui.get_text_metrics(word.font, text)
 		metrics.width = metrics.width * word.size
-		metrics.height = metrics.height * word.size
 		metrics.total_width = metrics.width
+		metrics.height = metrics.height * word.size
 	end
+
+	return metrics
+end
+
+local function get_box_metrics(word)
+	-- there is no way to measure an image without actually creating the node first
+	create_box_node(word)
+
+	-- get metrics of node based on image size
+	local size = gui.get_size(word.node)
+	local metrics = {}
+	metrics.total_width = size.x * word.size
+	metrics.width = size.x * word.size
+	metrics.height = size.y * word.size
+	return metrics
+end
+
+local function get_spine_metrics(word)
+	-- there is no way to measure a spine model without actually creating the node first
+	create_spine_node(word)
+	local size = gui.get_size(word.node)
+	local metrics = {}
+	metrics.total_width = size.x
+	metrics.width = size.x
+	metrics.height = size.y
 	return metrics
 end
 
 
-local function create_text_node(word, font, metrics)
-	local node = gui.new_text_node(V3_ZERO, word.text)
+
+local function create_text_node(word)
+	position_v3.x = word.position_x or 0
+	position_v3.y = word.position_y or 0
+	if not word.node then
+		word.node = gui.new_text_node(position_v3, word.text)
+	else
+		gui.set_position(word.node, position_v3)
+	end
+
+	local node = word.node
 	gui.set_id(node, new_id("textnode"))
-	gui.set_font(node, font)
+	gui.set_font(node, word.font)
 	gui.set_color(node, word.color)
 	if word.shadow then gui.set_shadow(node, word.shadow) end
 	if word.outline then gui.set_outline(node, word.outline) end
 	gui.set_scale(node, V3_ONE * word.size)
 
-	metrics = metrics or get_text_metrics(word, font)
+	local metrics = get_text_metrics(word)
 	gui.set_size_mode(node, gui.SIZE_MODE_MANUAL)
 	gui.set_size(node, vmath.vector3(metrics.width, metrics.height, 0))
-	return node, metrics
+
+	word.metrics = metrics
 end
 
 
-local function combine_node(previous_word, word, metrics)
-	local text = previous_word.text .. word.text
-	previous_word.text = text
-	previous_word.metrics = metrics
-	gui.set_size(previous_word.node, vmath.vector3(metrics.width, metrics.height, 0))
-	gui.set_text(previous_word.node, text)
-end
-
-
-local function create_node(word, parent, font, node, metrics)
+local function create_node(word, parent)
 	if word.image then
-		if not node then
-			node, metrics = create_box_node(word)
-		end
+		create_box_node(word)
 	elseif word.spine then
-		if not node then
-			node, metrics = create_spine_node(word)
-		end
+		create_spine_node(word)
 	else
-		node, metrics = create_text_node(word, font, metrics)
+		create_text_node(word)
 	end
-	gui.set_parent(node, parent)
-	gui.set_inherit_alpha(node, true)
-	return node, metrics
+	gui.set_parent(word.node, parent)
+	gui.set_inherit_alpha(word.node, true)
 end
 
 
-local function measure_node(word, font, previous_word)
-	local node, metrics, combined_metrics
+local function measure_node(word, previous_word)
 	if word.image then
-		node, metrics = create_box_node(word)
+		word.metrics = get_box_metrics(word)
+		return word.metrics
 	elseif word.spine then
-		node, metrics = create_spine_node(word)
+		word.metrics = get_spine_metrics(word)
+		return word.metrics
+	elseif word.text then
+		-- text node
+		word.metrics = get_text_metrics(word)
+		local combined_metrics = previous_word and get_text_metrics(word, previous_word.text .. word.text)
+		return word.metrics, combined_metrics
 	else
-		metrics = get_text_metrics(word, font)
-		if previous_word then
-			combined_metrics = get_text_metrics(word, font, previous_word.text .. word.text)
-		end
+		error("Unknown word type")
 	end
-	return metrics, combined_metrics, node
 end
 
-local function split_word(word, font, max_width)
+local function split_word(word, max_width)
 	local one = deepcopy(word)
 	local two = deepcopy(word)
 	local text = word.text
-	local metrics = get_text_metrics(one, font)
+	local metrics = get_text_metrics(one)
 	local char_count = utf8.len(text)
 	local split_index = math.floor(char_count * (max_width / metrics.total_width))
 	local rest = ""
 	while split_index > 1 do
 		one.text = utf8.sub(text, 1, split_index)
 		one.linebreak = true
-		metrics = get_text_metrics(one, font)
+		metrics = get_text_metrics(one)
 		if metrics.width <= max_width then
 			rest = utf8.sub(text, split_index + 1)
 			break
@@ -363,6 +377,7 @@ function M.create(text, font, settings)
 	settings.paragraph_spacing = settings.paragraph_spacing or 0.5
 	settings.image_pixel_grid_snap = settings.image_pixel_grid_snap or false
 	settings.combine_words = settings.combine_words or false
+	settings.dryrun = settings.dryrun or false
 	if settings.align == M.ALIGN_JUSTIFY and not settings.width then
 		error("Width must be specified if text should be justified")
 	end
@@ -386,10 +401,16 @@ function M.create(text, font, settings)
 		color = settings.color,
 		shadow = settings.shadow,
 		outline = settings.outline,
-		font = font,
 		size = settings.size
 	}
 	local words = parser.parse(text, word_settings)
+
+	-- assign the correct font to each word, based on tags
+	for i=1,#words do
+		local word = words[i]
+		word.font = get_font(word, settings.fonts, font)
+	end
+
 	local text_metrics = {
 		width = 0,
 		height = 0,
@@ -414,9 +435,6 @@ function M.create(text, font, settings)
 			text_metrics.char_count = text_metrics.char_count + parser.length(word.text)
 		end
 
-		-- get font to use based on word tags
-		local font_for_word = get_font(word, settings.fonts)
-
 		-- get the previous word, so we can combine
 		local previous_word
 		if settings.combine_words then
@@ -426,9 +444,8 @@ function M.create(text, font, settings)
 			end
 		end
 
-		-- get metrics first, without creating the node (if possible)
-		local word_metrics, combined_metrics, node = measure_node(word, font_for_word, previous_word)
-		local should_create_node = true
+		-- get metrics first
+		local word_metrics, combined_metrics = measure_node(word, previous_word)
 
 		-- check if the line overflows due to this word
 		local overflow = false
@@ -443,8 +460,8 @@ function M.create(text, font, settings)
 			-- split the word and add the first part to the current line
 			if overflow and word.text and word_metrics.width > settings.width then
 				local remaining_width = settings.width - line_width
-				local one, two = split_word(word, font_for_word, remaining_width)
-				word_metrics, combined_metrics, node = measure_node(one, font_for_word, previous_word)
+				local one, two = split_word(word, remaining_width)
+				word_metrics, combined_metrics = measure_node(one, previous_word)
 				words[i] = one
 				word = one
 				table.insert(words, i + 1, two)
@@ -452,7 +469,7 @@ function M.create(text, font, settings)
 				overflow = false
 			end
 		end
-		
+
 		if overflow and not word.nobr then
 			-- overflow, position the words that fit on the line
 			text_metrics.height = text_metrics.height + (line_height * line_increment_before * settings.line_spacing)
@@ -474,28 +491,15 @@ function M.create(text, font, settings)
 			if combined_metrics then
 				line_width = line_width - previous_word.metrics.total_width + combined_metrics.total_width
 				line_height = math.max(line_height, combined_metrics.height)
-				combine_node(previous_word, word, combined_metrics)
-				should_create_node = false
+				previous_word.text = previous_word.text .. word.text
+				previous_word.metrics = combined_metrics
+				word.delete = true
 			else
 				line_width = line_width + word_metrics.total_width
 				line_height = math.max(line_height, word_metrics.height)
 				line_words[#line_words + 1] = word
 			end
 			text_metrics.width = math.max(text_metrics.width, line_width)
-		end
-
-		if should_create_node then
-			word.node, word.metrics = create_node(word, settings.parent, font_for_word, node, word_metrics)
-			gui.set_pivot(word.node, pivot)
-
-			-- assign layer
-			local layer = get_layer(word, settings.layers)
-			if layer then
-				gui.set_layer(word.node, layer)
-			end
-		else
-			-- queue this word for deletion
-			word.delete = true
 		end
 
 		if word.paragraph_end then
@@ -535,6 +539,21 @@ function M.create(text, font, settings)
 		text_metrics.height = text_metrics.height + (line_height * line_increment_after * settings.line_spacing)
 	end
 
+	-- create the nodes (unless doing a dry-run)
+	if not settings.dryrun then
+		for i=1,word_count do
+			local word = words[i]
+			create_node(word, settings.parent)
+			gui.set_pivot(word.node, pivot)
+
+			-- assign layer
+			local layer = get_layer(word, settings.layers)
+			if layer then
+				gui.set_layer(word.node, layer)
+			end
+		end
+	end
+
 	-- compact words table
 	local j = 1
 	for i = 1, word_count do
@@ -544,7 +563,9 @@ function M.create(text, font, settings)
 			j = j + 1
 		end
 	end
+	-- delete words (and associated nodes if they exist)
 	for i = j, word_count do
+		local word = words[i]
 		words[i] = nil
 	end
 
@@ -634,7 +655,7 @@ function M.truncate(words, length, options)
 					text = utf8.sub(word.text, 1, word_length - overflow)
 				end
 				gui.set_text(word.node, text)
-				word.metrics = get_text_metrics(word, word.font, text)
+				word.metrics = get_text_metrics(word, text)
 			end
 			count = count + word_length
 		end
@@ -659,7 +680,8 @@ function M.characters(word)
 	-- exit early if word is a single character or empty
 	if word_length <= 1 then
 		local char = deepcopy(word)
-		char.node, char.metrics = create_node(char, parent, font)
+		char.node = nil
+		create_node(char, parent)
 		gui.set_pivot(char.node, pivot)
 		gui.set_position(char.node, gui.get_position(word.node))
 		gui.set_layer(char.node, layer)
@@ -673,14 +695,16 @@ function M.characters(word)
 
 	for i = 1, word_length do
 		local char = deepcopy(word)
+		char.node = nil
 		chars[#chars + 1] = char
 		char.text = utf8.sub(word.text, i, i)
-		char.node, char.metrics = create_node(char, parent, font)
+		create_node(char, parent)
 		gui.set_layer(char.node, layer)
 		gui.set_pivot(char.node, pivot)
 
-		local sub_metrics = get_text_metrics(word, font, utf8.sub(word.text, 1, i))
+		local sub_metrics = get_text_metrics(word, utf8.sub(word.text, 1, i))
 		position.x = position_x + sub_metrics.width - char.metrics.width
+		gui.set_enabled(char.node, true)
 		gui.set_position(char.node, position)
 	end
 

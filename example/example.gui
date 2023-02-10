@@ -90,6 +90,9 @@ nodes {
   alpha: 1.0
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
+  custom_type: 0
+  enabled: true
+  visible: true
 }
 nodes {
   position {
@@ -111,8 +114,8 @@ nodes {
     w: 1.0
   }
   size {
-    x: 32.0
-    y: 32.0
+    x: 200.0
+    y: 100.0
     z: 0.0
     w: 1.0
   }
@@ -144,6 +147,9 @@ nodes {
   alpha: 1.0
   template_node_child: false
   size_mode: SIZE_MODE_AUTO
+  custom_type: 0
+  enabled: true
+  visible: true
 }
 nodes {
   position {
@@ -198,6 +204,9 @@ nodes {
   alpha: 1.0
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
+  custom_type: 0
+  enabled: true
+  visible: true
 }
 nodes {
   position {
@@ -238,6 +247,8 @@ nodes {
   alpha: 1.0
   template: "/example/button.gui"
   template_node_child: false
+  custom_type: 0
+  enabled: true
 }
 nodes {
   position {
@@ -293,6 +304,9 @@ nodes {
   alpha: 1.0
   template_node_child: true
   size_mode: SIZE_MODE_MANUAL
+  custom_type: 0
+  enabled: true
+  visible: true
 }
 nodes {
   position {
@@ -357,6 +371,9 @@ nodes {
   template_node_child: true
   text_leading: 1.0
   text_tracking: 0.0
+  custom_type: 0
+  enabled: true
+  visible: true
 }
 nodes {
   position {
@@ -411,6 +428,9 @@ nodes {
   alpha: 1.0
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
+  custom_type: 0
+  enabled: true
+  visible: true
 }
 layers {
   name: "below"
@@ -438,8 +458,4 @@ layers {
 }
 material: "/builtins/materials/gui.material"
 adjust_reference: ADJUST_REFERENCE_PARENT
-max_nodes: 512
-spine_scenes {
-  name: "spineboy"
-  spine_scene: "/example/assets/spineboy.spinescene"
-}
+max_nodes: 4096

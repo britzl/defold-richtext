@@ -189,6 +189,7 @@ The `settings` table can contain the following values:
 * `paragraph_spacing` (number) - Space to leave after lines with where `<p>` tags end. Relative to the line height. Defaults to 0.5 lines.
 * `image_pixel_grid_snap` (boolean) - Set to true to position image on full pixels (positions rounded to nearest integer) to avoid effects of anti-aliasing. Defaults to false.
 * `combine_words` (boolean) - Set to true to combine words with the same style on a line into a single node. This is useful for very long texts where the maximum number of nodes would exceed the limit set in the GUI. The disadvantage is that any per word operations will not work since the words have been combined.
+* `dryrun` (boolean) - Set to true to perform a complete layout of the words without creating gui nodes.
 
 The `fonts` table should have the following format:
 

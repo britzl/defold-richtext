@@ -1,7 +1,7 @@
 [project]
 title = RichText
 version = 1.0.0
-dependencies = 
+dependencies#0 = https://github.com/defold/lua-language-server/releases/download/v0.0.3/release.zip
 
 [bootstrap]
 main_collection = /example/example.collectionc
@@ -18,4 +18,7 @@ shared_state = 1
 
 [library]
 include_dirs = richtext
+
+[graphics]
+max_characters = 16000
 
