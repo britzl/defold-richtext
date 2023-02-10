@@ -721,5 +721,19 @@ function M.remove(words)
 	end
 end
 
+function M.plaintext(words)
+	local s = ""
+	for i=1,#words do
+		local word = words[i]
+		if word.text then
+			s = s .. word.text
+			if word.linebreak then
+				s = s .. "\n"
+			end
+		end
+	end
+	return s
+end
+
 
 return M

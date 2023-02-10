@@ -318,6 +318,16 @@ Removes all gui text nodes created by `richtext.create()`.
 * `words` (table) - Table of words, as received from a call to `richtext.create()`.
 
 
+### richtext.plaintext(words)
+Returns the words created by `richtext.create()` as a plain text string without any formatting or tags. Linebreaks are included in the returned string.
+
+**PARAMETERS**
+* `words` (table) - Table of words, as received from a call to `richtext.create()`.
+
+**RETURNS**
+* `plaintext` (string) - Plain text version of the words.
+
+
 ### richtext.ALIGN_LEFT
 Left-align text. The words of a line starts at the specified position (see `richtext.create` settings above).
 

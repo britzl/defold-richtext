@@ -69,6 +69,7 @@ local function create_complex_example()
 	local words, metrics = richtext.create(text, "Roboto", settings)
 
 	print("The text consists of " .. tostring(metrics.char_count) .. " characters")
+	print("The plain-text is " .. richtext.plaintext(words))
 
 	-- adjust background to cover text
 	gui.set_size(settings.parent, vmath.vector3(metrics.width, metrics.height, 0))
