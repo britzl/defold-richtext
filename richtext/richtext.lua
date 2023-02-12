@@ -291,7 +291,7 @@ local function create_text_node(word)
 
 	local metrics = get_text_metrics(word)
 	gui.set_size_mode(node, gui.SIZE_MODE_MANUAL)
-	gui.set_size(node, vmath.vector3(metrics.width, metrics.height, 0))
+	gui.set_size(node, vmath.vector3(metrics.width / word.size, metrics.height / word.size, 0))
 
 	word.metrics = metrics
 end
