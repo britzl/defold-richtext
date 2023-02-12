@@ -543,30 +543,31 @@ function M.create(text, font, settings)
 	if not settings.dryrun then
 		for i=1,word_count do
 			local word = words[i]
-			create_node(word, settings.parent)
-			gui.set_pivot(word.node, pivot)
-
-			-- assign layer
-			local layer = get_layer(word, settings.layers)
-			if layer then
-				gui.set_layer(word.node, layer)
+			if not word.delete then
+				create_node(word, settings.parent)
+				gui.set_pivot(word.node, pivot)
+				local layer = get_layer(word, settings.layers)
+				if layer then
+					gui.set_layer(word.node, layer)
+				end
 			end
 		end
 	end
 
 	-- compact words table
+	-- delete words (and associated nodes if they exist)
 	local j = 1
 	for i = 1, word_count do
 		local word = words[i]
 		if not word.delete then
 			words[j] = word
 			j = j + 1
+		else
+			words[i] = nil
+			if word.node then
+				gui.delete_node(word.node)
+			end
 		end
-	end
-	-- delete words (and associated nodes if they exist)
-	for i = j, word_count do
-		local word = words[i]
-		words[i] = nil
 	end
 
 	return words, text_metrics
