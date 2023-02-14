@@ -560,6 +560,7 @@ function M.create(text, font, settings)
 	for i = 1, word_count do
 		local word = words[i]
 		if not word.delete then
+			words[i] = nil
 			words[j] = word
 			j = j + 1
 		else
