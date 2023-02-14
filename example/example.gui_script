@@ -366,6 +366,7 @@ end
 
 
 function on_message(self, message_id, message, sender)
+	print(message_id)
 	if message_id == hash("click_text") then
 		gui.animate(gui.get_node("flower"), gui.PROP_POSITION, gui.get_position(gui.get_node(message.node_id)), gui.EASING_INOUTQUAD, 1)
 	end
