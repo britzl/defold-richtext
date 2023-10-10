@@ -589,7 +589,8 @@ function M.on_click(words, action)
 					node_id = gui.get_id(word.node),
 					text = word.text,
 					x = action.x, y = action.y,
-					screen_x = action.screen_x, screen_y = action.screen_y
+					screen_x = action.screen_x, screen_y = action.screen_y,
+					tags = word.tags
 				}
 				msg.post("#", word.tags.a, message)
 				return true
