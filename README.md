@@ -301,7 +301,13 @@ Split a word into it's characters, including the creation of the gui nodes. Each
 
 
 ### richtext.on_click(words, action)
-Call this function when a click/touch has been detected and your text contains words with an `a` tag. These words act as "hyperlinks" and will generate a message when clicked.
+Call this function when a click/touch has been detected and your text contains words with an `a` tag. These words act as "hyperlinks" and will generate a message when clicked. The generated message will contain the following values:
+
+* `node_id` (hash) - Id of the node which was clicked
+* `text` (string) - Text of the clicked word
+* `screen_x` (number) - Horizontal position of the click
+* `screen_y` (number) - Vertical position of the click
+* `tags` (table) - All tags on the clicked word
 
 **PARAMETERS**
 * `words` (table) - A list of words, as received from `richtext.create()` or `richtext.tagged()`.
