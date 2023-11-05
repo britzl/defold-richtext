@@ -78,6 +78,15 @@ end
 
 
 local function create_align_example()
+	local settings_valign_bottom = { position = vmath.vector3(10, 870, 0), valign = richtext.VALIGN_BOTTOM, width = 700 }
+	local valign_bottom = richtext.create("Align <size=2>EVERYTHING</size> to\nthe <size=0.5>BOTTOM</size>of each line", "Roboto-Regular", settings_valign_bottom)
+
+	local settings_valign_top = { position = vmath.vector3(10, 720, 0), valign = richtext.VALIGN_TOP, width = 700 }
+	local valign_top = richtext.create("Align <size=2>EVERYTHING</size> to\nthe <size=0.5>TOP</size>of each line", "Roboto-Regular", settings_valign_top)
+
+	local settings_valign_middle = { position = vmath.vector3(10, 570, 0), valign = richtext.VALIGN_MIDDLE, width = 700 }
+	local valign_middle = richtext.create("Align <size=2>EVERYTHING</size> to\nthe <size=0.5>MIDDLE</size>of each line", "Roboto-Regular", settings_valign_middle)
+
 	local settings_align_justify = { position = vmath.vector3(10, 420, 0), align = richtext.ALIGN_JUSTIFY, width = 300 }
 	local justify = richtext.create("Justify this text\nDo it for both lines", "Roboto-Regular", settings_align_justify)
 
@@ -89,7 +98,7 @@ local function create_align_example()
 
 	local settings_align_center = { position = vmath.vector3(320, 90, 0), align = richtext.ALIGN_CENTER }
 	local center = richtext.create("Center words around the specified position\nAnd these words as well", "Roboto-Regular", settings_align_center)
-	return merge(justify, left, right, center)
+	return merge(justify, left, right, center, valign_top, valign_middle, valign_bottom)
 end
 
 
