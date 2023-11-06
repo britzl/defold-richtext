@@ -47,7 +47,7 @@ end
 
 
 local function get_font(word, fonts, default_font)
-	local font_settings = fonts[(word.tags.font or word.font) or default_font]
+	local font_settings = fonts[word.tags.font or word.font or default_font]
 	local font = nil
 	if font_settings then
 		if word.bold and word.italic then
