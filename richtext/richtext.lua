@@ -12,6 +12,7 @@ M.VALIGN_TOP = hash("VALIGN_TOP")
 M.VALIGN_MIDDLE = hash("VALIGN_MIDDLE")
 M.VALIGN_BOTTOM = hash("VALIGN_BOTTOM")
 
+local FONT_CACHE = {}
 
 local V4_ZERO = vmath.vector4(0)
 local V4_ONE = vmath.vector4(1)
@@ -30,6 +31,10 @@ local function new_id(prefix)
 	return hash((prefix or "") .. tostring(id_counter))
 end
 
+-- https://stackoverflow.com/a/72921992/1266551
+local function endswith(s, suffix)
+	return s:sub(-#suffix) == suffix
+end
 
 local function deepcopy(orig)
 	local orig_type = type(orig)
@@ -136,7 +141,8 @@ local function position_words(words, line_width, line_height, position, settings
 			spacing = (settings.width - words_width) / (word_count - 1)
 		end
 	end
-	for i=1,#words do
+	local word_count = #words
+	for i=1,word_count do
 		local word = words[i]
 		-- align spine animations to bottom of line since
 		-- spine animations ignore pivot (always PIVOT_S)
@@ -152,7 +158,11 @@ local function position_words(words, line_width, line_height, position, settings
 			word.position_x = position.x
 			word.position_y = position.y
 		end
-		position.x = position.x + word.metrics.total_width + spacing
+		if #word.text > 0 and not endswith(word.text, " ") and word_count > 1 then
+			position.x = position.x + word.metrics.width + spacing - word.metrics.font.space
+		else
+			position.x = position.x + word.metrics.total_width + spacing
+		end
 		words[i] = nil
 	end
 end
@@ -230,17 +240,36 @@ end
 local function get_text_metrics(word, text)
 	text = text or word.text
 
-	local metrics
+	local font = FONT_CACHE[word.font]
+	if not font then
+		font = {}
+		font.name = word.font
+		font.resource = gui.get_font_resource(font.name)
+		local ab = gui.get_text_metrics(font.name, "ab")
+		local a = gui.get_text_metrics(font.name, "a")
+		local b = gui.get_text_metrics(font.name, "b")
+		font.empty = gui.get_text_metrics(font.name, "|")
+		font.space = a.width + b.width - ab.width
+		FONT_CACHE[word.font] = font
+	end
+
+	print("get text metrics '" .. text .. "'")
+	local metrics = {}
 	if utf8.len(text) == 0 then
-		metrics = gui.get_text_metrics(word.font, "|")
+		metrics.max_ascent = font.empty.max_ascent
+		metrics.max_descent = font.empty.max_descent
 		metrics.width = 0
 		metrics.total_width = 0
-		metrics.height = metrics.height * word.size
+		metrics.height = font.empty.height * word.size
+		metrics.font = font
 	else
-		metrics = gui.get_text_metrics(word.font, text)
-		metrics.width = metrics.width * word.size
+		local m = gui.get_text_metrics(font.name, text)
+		metrics.max_ascent = m.max_ascent
+		metrics.max_descent = m.max_descent
+		metrics.width = m.width * word.size
 		metrics.total_width = metrics.width
-		metrics.height = metrics.height * word.size
+		metrics.height = m.height * word.size
+		metrics.font = font
 	end
 
 	return metrics
