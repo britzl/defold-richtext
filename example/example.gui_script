@@ -65,7 +65,14 @@ local function create_complex_example()
 		align = richtext.ALIGN_LEFT,
 		line_spacing = 0.85,
 	}
-	local text = "<size=3><outline=green>&gt;RichText&lt;</outline></size><shadow=red>Lorem</shadow> <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color><size=1.15><font=Nanum>consectetur </font></size>adipiscing elit.<br/><b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\nNullam ornare <img=smileys:hungry></img>accumsan rhoncus.\n\n<size=0.5>Nunc placerat nibh a purus auctor, id scelerisque massa</size> <size=2>rutrum.</size>"
+	local text = "<size=3><outline=green>&gt;RichText&lt;</outline></size>"
+	.. "<shadow=red>Lorem</shadow> <color=0,0.5,0,1>ipsum </color><img=smileys:zombie/> dolor <color=red>sit </color><color=#ff00ffff>amet, </color>"
+	.. "<size=1.15><font=Nanum>consectetur </font></size>adipiscing elit.<br/>"
+	.. "<b>Nunc </b>tincidunt <b><i>mattis</i> libero</b> <i>non viverra</i>.\n\n"
+	.. "Nullam ornare <img=smileys:hungry/>accumsan rhoncus.\n\n"
+	.. "<size=0.5>Nunc placerat nibh a purus auctor, id scelerisque massa</size>\n"
+	.. "<size=0.5>Nunc placerat nibh a pu<color=red>rus</color> auctor, id sc<color=red>el</color>e<color=green>ri</color>s<color=blue>qu</color>e massa</size> "
+	.. "<size=2>rutrum.</size>"
 	local words, metrics = richtext.create(text, "Roboto", settings)
 
 	print("The text consists of " .. tostring(metrics.char_count) .. " characters")
