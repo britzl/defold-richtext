@@ -159,7 +159,7 @@ local function position_words(words, line_width, line_height, position, settings
 			word.position_y = position.y
 		end
 		if #word.text > 0 and not endswith(word.text, " ") and word_count > 1 then
-			position.x = position.x + word.metrics.width + spacing - word.metrics.font.space
+			position.x = position.x + word.metrics.width + spacing - word.metrics.space_width * word.size
 		else
 			position.x = position.x + word.metrics.total_width + spacing
 		end
@@ -248,20 +248,22 @@ local function get_text_metrics(word, text)
 		local ab = gui.get_text_metrics(font.name, "ab")
 		local a = gui.get_text_metrics(font.name, "a")
 		local b = gui.get_text_metrics(font.name, "b")
-		font.empty = gui.get_text_metrics(font.name, "|")
-		font.space = a.width + b.width - ab.width
+		local empty = gui.get_text_metrics(font.name, "|")
+		font.max_ascent = empty.max_ascent
+		font.max_descent = empty.max_descent
+		font.height = empty.height
+		font.space_width = a.width + b.width - ab.width
 		FONT_CACHE[word.font] = font
 	end
 
-	print("get text metrics '" .. text .. "'")
 	local metrics = {}
 	if utf8.len(text) == 0 then
-		metrics.max_ascent = font.empty.max_ascent
-		metrics.max_descent = font.empty.max_descent
+		metrics.max_ascent = font.max_ascent
+		metrics.max_descent = font.max_descent
 		metrics.width = 0
 		metrics.total_width = 0
-		metrics.height = font.empty.height * word.size
-		metrics.font = font
+		metrics.height = font.height * word.size
+		metrics.space_width = font.space_width
 	else
 		local m = gui.get_text_metrics(font.name, text)
 		metrics.max_ascent = m.max_ascent
@@ -269,7 +271,7 @@ local function get_text_metrics(word, text)
 		metrics.width = m.width * word.size
 		metrics.total_width = metrics.width
 		metrics.height = m.height * word.size
-		metrics.font = font
+		metrics.space_width = font.space_width
 	end
 
 	return metrics
