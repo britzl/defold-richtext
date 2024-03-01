@@ -25,6 +25,10 @@ local position_v3 = vmath.vector3()
 
 local id_counter = 0
 
+local function check_spine()
+	assert(spine, "Spine is not available. Did you add 'extension-spine' as a dependency?")
+end
+
 local function new_id(prefix)
 	id_counter = id_counter + 1
 	return hash((prefix or "") .. tostring(id_counter))
@@ -75,6 +79,7 @@ local function get_layer(word, layers)
 	if word.image then
 		return layers.images[gui.get_texture(node)]
 	elseif word.spine then
+		check_spine()
 		return layers.spinescenes[gui.get_spine_scene(node)]
 	end
 	return layers.fonts[gui.get_font(node)]
@@ -212,6 +217,7 @@ end
 
 
 local function create_spine_node(word)
+	check_spine()
 	position_v3.x = word.position_x or 0
 	position_v3.y = word.position_y or 0
 	if not word.node then

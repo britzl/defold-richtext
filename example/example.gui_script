@@ -342,7 +342,7 @@ function init(self)
 		{ name = "ALIGN", fn = create_align_example },
 		{ name = "TRUNCATE", fn = create_truncate_example },
 		{ name = "CHARACTERS", fn = create_characters_example },
-		{ name = "SPINE", fn = create_spine_example },
+		--{ name = "SPINE", fn = create_spine_example },
 		{ name = "LANGUAGE", fn = create_language_example },
 		{ name = "LINEBREAK", fn = create_linebreak_example },
 		{ name = "CLICKABLE", fn = create_clickable_words_example },
