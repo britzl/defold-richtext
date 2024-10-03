@@ -119,7 +119,7 @@ end
 
 -- position all words according to the line alignment and line width
 -- the list of words will be empty after this function is called
-local function position_words(words, line_width, line_height, position, settings)
+local function position_words(words, line_width, line_height, position, settings, line_break)
 	if settings.align == M.ALIGN_RIGHT then
 		position.x = position.x - line_width
 	elseif settings.align == M.ALIGN_CENTER then
@@ -127,7 +127,7 @@ local function position_words(words, line_width, line_height, position, settings
 	end
 
 	local spacing = 0
-	if settings.align == M.ALIGN_JUSTIFY then
+	if settings.align == M.ALIGN_JUSTIFY and not line_break then
 		local words_width = 0
 		local word_count = 0
 		for i=1,#words do
@@ -481,7 +481,7 @@ function M.create(text, font, settings)
 			text_metrics.height = text_metrics.height + (line_height * line_increment_before * settings.line_spacing)
 			position.x = settings.position.x
 			position.y = settings.position.y - text_metrics.height
-			position_words(line_words, line_width, line_height, position, settings)
+			position_words(line_words, line_width, line_height, position, settings, false)
 
 			-- add the word that didn't fit to the next line instead
 			line_words[#line_words + 1] = word
@@ -524,7 +524,7 @@ function M.create(text, font, settings)
 			text_metrics.height = text_metrics.height + (line_height * line_increment_before * settings.line_spacing)
 			position.x = settings.position.x
 			position.y = settings.position.y - text_metrics.height
-			position_words(line_words, line_width, line_height, position, settings)
+			position_words(line_words, line_width, line_height, position, settings, true)
 
 			-- update text metrics
 			text_metrics.height = text_metrics.height + (line_height * line_increment_after * settings.line_spacing) + paragraph_spacing
@@ -541,7 +541,7 @@ function M.create(text, font, settings)
 		text_metrics.height = text_metrics.height + (line_height * line_increment_before * settings.line_spacing)
 		position.x = settings.position.x
 		position.y = settings.position.y - text_metrics.height
-		position_words(line_words, line_width, line_height, position, settings)
+		position_words(line_words, line_width, line_height, position, settings, true)
 		text_metrics.height = text_metrics.height + (line_height * line_increment_after * settings.line_spacing)
 	end
 
