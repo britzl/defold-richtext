@@ -104,6 +104,7 @@ function M.parse(text, default_settings)
 	assert(text)
 	assert(default_settings)
 
+	local original_text = text
 	text = text:gsub("&zwsp;", "<zwsp>\226\128\139</zwsp>")
 	local all_words = {}
 	local open_tags = {}
@@ -165,7 +166,10 @@ function M.parse(text, default_settings)
 						break
 					end
 				end
-				if not found then print(("Found end tag '%s' without matching start tag"):format(name)) end
+				if not found then
+					print(("Found end tag '%s' without matching start tag when parsing text '%s'"):format(name, original_text))
+					print(debug.traceback())
+				end
 			end
 		end
 
