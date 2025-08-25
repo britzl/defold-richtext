@@ -258,22 +258,33 @@ local function get_box_metrics(word)
 
 	-- get metrics of node based on image size
 	local size = gui.get_size(word.node)
-	local metrics = {}
-	metrics.total_width = size.x * word.size
-	metrics.width = size.x * word.size
-	metrics.height = size.y * word.size
-	return metrics
+
+	-- clean up immediately
+	gui.delete_node(word.node)
+	word.node = nil
+
+	return {
+		total_width = size.x * word.size,
+		width = size.x * word.size,
+		height = size.y * word.size,
+	}
 end
 
 local function get_spine_metrics(word)
 	-- there is no way to measure a spine model without actually creating the node first
 	create_spine_node(word)
+
 	local size = gui.get_size(word.node)
-	local metrics = {}
-	metrics.total_width = size.x
-	metrics.width = size.x
-	metrics.height = size.y
-	return metrics
+
+	-- clean up immediately
+	gui.delete_node(word.node)
+	word.node = nil
+
+	return {
+		total_width = size.x,
+		width = size.x,
+		height = size.y,
+	}
 end
 
 
